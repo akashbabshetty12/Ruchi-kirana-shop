@@ -17,7 +17,7 @@
 
   <header>
     <div class="title">Ruchi Kirana Shop</div>
-    <div class="subtitle">Simple Hungerbox-style billing (no GST)</div>
+    <div class="subtitle">Hungerbox-style billing (No GST)</div>
 
     <div class="tabs">
       <button id="customerTab" class="active">Customer</button>
@@ -31,16 +31,11 @@
     <div class="card">
       <h2>Customer Details</h2>
       <input id="custName" class="input" placeholder="Enter customer name" required>
-      <div class="small" style="margin-top:4px;">Name will appear on the bill.</div>
-
-      <div id="nameError" style="color:red;font-size:12px;display:none;">
-        Customer name is required.
-      </div>
+      <div id="nameError" class="error">Customer name is required.</div>
     </div>
 
     <div class="card">
       <h2>Products</h2>
-      <div class="small">Tap + / − to add or remove items.</div>
       <div id="categoryTabs" class="catTabs"></div>
       <div id="productList"></div>
     </div>
@@ -52,17 +47,16 @@
       <h2>Manage Products</h2>
       <table id="adminTable" class="adminTable"></table>
 
-      <h2 style="margin-top:10px;">Add Product</h2>
+      <h2>Add Product</h2>
       <input id="pName" class="input" placeholder="Product name">
-      <div style="height:6px;"></div>
       <input id="pCategory" class="input" placeholder="Category">
-      <div style="height:6px;"></div>
-      <input id="pPrice" class="input" placeholder="Price" type="number" min="0" step="0.01">
-      <div style="margin-top:6px;font-size:12px;">
-        <label><input type="checkbox" id="pActive" checked> Active</label>
-      </div>
+      <input id="pPrice" class="input" placeholder="Price" type="number">
 
-      <button class="btn primary" onclick="addProduct()">Add Product</button>
+      <label style="font-size:14px;margin-top:6px;">
+        <input type="checkbox" id="pActive" checked> Active
+      </label>
+
+      <button class="btn primary" onclick="addProduct()">Add</button>
       <button class="btn dark" onclick="saveProducts()">Save Products</button>
     </div>
   </section>
@@ -71,14 +65,14 @@
   <section id="historySection" style="display:none;">
     <div class="card">
       <h2>Bill History</h2>
-      <div id="historyList" class="small" style="margin-top:6px;">No bills saved.</div>
-      <button class="btn dark" style="margin-top:14px;" onclick="clearHistory()">Clear All History</button>
+      <div id="historyList">No bills saved.</div>
+      <button class="btn dark" onclick="clearHistory()" style="margin-top:10px;">Clear All</button>
     </div>
   </section>
 
 </div>
 
-<!-- Hidden for Image Generation -->
+<!-- Hidden for Image Capture -->
 <div id="billPreview" style="display:none;"></div>
 
 <!-- DRAWER -->
@@ -86,50 +80,46 @@
   <div class="drawer-card">
 
     <div class="drawer-summary" onclick="toggleDrawer()">
-      <div class="drawer-left">
+      <div>
         <div class="drawer-title">View Bill</div>
-        <div id="drawerItems" class="drawer-sub">0 items selected</div>
+        <div id="drawerItems" class="drawer-sub">0 items</div>
       </div>
 
-      <div style="display:flex;align-items:center;gap:8px;">
-        <div id="drawerTotal" class="drawer-total">₹0</div>
-        <div id="drawerToggleIcon" class="drawer-toggle">▲</div>
+      <div class="drawer-right">
+        <span id="drawerTotal">₹0</span>
+        <span id="drawerToggleIcon">▲</span>
       </div>
     </div>
 
-    <div id="drawerBody" class="drawer-body" style="display:none;">
+    <div id="drawerBody" class="drawer-body">
 
       <div class="drawer-row">
-        <span class="label">Billing Date</span>
-        <span id="billingDate" class="value">—</span>
+        <span>Billing Date</span>
+        <span id="billingDate">—</span>
       </div>
 
       <div class="drawer-row">
-        <span class="label">Customer</span>
-        <input id="custNameDrawer" placeholder="Enter customer name" required>
+        <span>Customer</span>
+        <input id="custNameDrawer">
       </div>
+      <div id="nameErrorDrawer" class="error">Customer name is required.</div>
 
-      <div id="nameErrorDrawer" style="color:red;font-size:12px;display:none;">
-        Customer name is required.
-      </div>
-
-      <table id="billTable" class="billTable">
+      <table class="billTable">
         <thead>
           <tr>
             <th>Item</th>
             <th style="width:40px;">Qty</th>
-            <th class="amount">Total</th>
+            <th>Total</th>
           </tr>
         </thead>
         <tbody id="billBody"></tbody>
       </table>
 
-      <div class="drawer-row total-row">
+      <div class="drawer-row total">
         <span>Total</span>
         <span id="grandTotalText">₹0</span>
       </div>
 
-      <!-- FINAL BUTTON ROW -->
       <div class="drawer-buttons">
         <button class="btn primary" onclick="downloadImage()">Save</button>
         <button class="btn dark" onclick="shareImage()">Share</button>
@@ -144,4 +134,3 @@
 <script src="script.js"></script>
 </body>
 </html>
-
