@@ -1,246 +1,196 @@
-* {
-  box-sizing: border-box;
-}
-
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: system-ui, Arial;
   background: #f3f4f6;
-  display: flex;
-  justify-content: center;
 }
 
 .app {
-  background: white;
-  width: 100%;
-  max-width: 480px;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  padding-bottom: 90px;
+  max-width: 600px;
+  margin: auto;
+  padding-bottom: 80px;
 }
 
-/* HEADER */
 header {
-  background: linear-gradient(135deg, #f97316, #fb923c);
-  color: white;
-  padding: 14px 12px 10px;
+  background: white;
+  padding: 15px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
 }
 
-header .title {
-  font-size: 20px;
-  font-weight: 700;
+.title {
+  font-size: 22px;
+  font-weight: bold;
 }
 
-header .subtitle {
+.subtitle {
   font-size: 12px;
-  opacity: 0.9;
+  color: #777;
+  margin-top: 4px;
 }
 
 .tabs {
+  margin-top: 15px;
   display: flex;
-  margin-top: 10px;
-  background: rgba(255,255,255,0.25);
-  border-radius: 999px;
-  padding: 3px;
+  justify-content: space-around;
 }
 
 .tabs button {
   flex: 1;
-  border: 0;
-  padding: 7px 0;
-  font-size: 13px;
-  border-radius: 999px;
-  background: transparent;
-  color: #fffbeb;
+  padding: 10px;
+  border: none;
+  background: #e5e7eb;
+  cursor: pointer;
 }
 
 .tabs .active {
-  background: white;
-  color: #ea580c;
-  font-weight: 600;
-}
-
-/* SECTIONS */
-section {
-  padding: 10px 10px 16px;
+  background: #2563eb;
+  color: white;
 }
 
 .card {
-  background: #f9fafb;
-  border-radius: 12px;
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #e5e7eb;
-}
-
-.card h2 {
-  font-size: 15px;
-  margin: 0 0 6px;
-}
-
-.small {
-  font-size: 12px;
-  color: #6b7280;
+  background: white;
+  padding: 15px;
+  margin: 12px;
+  border-radius: 8px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.1);
 }
 
 .input {
   width: 100%;
-  padding: 7px 8px;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-top: 6px;
 }
 
-/* CATEGORY TABS */
+.error {
+  color: red;
+  font-size: 12px;
+  display: none;
+}
+
 .catTabs {
+  margin: 10px 0;
   display: flex;
   gap: 6px;
-  overflow-x: auto;
-  padding: 4px 0 6px;
-  margin-bottom: 6px;
+  flex-wrap: wrap;
 }
 
 .catTab {
-  padding: 5px 10px;
-  border-radius: 999px;
-  border: 1px solid #fed7aa;
-  background: white;
-  font-size: 12px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: none;
+  background: #ddd;
+  cursor: pointer;
 }
 
 .catTab.active {
-  background: #f97316;
+  background: #2563eb;
   color: white;
 }
 
-/* PRODUCT LIST */
 .product {
   display: flex;
   justify-content: space-between;
-  padding: 8px;
-  background: white;
-  border-radius: 10px;
-  border: 1px solid #e5e7eb;
-  margin-bottom: 6px;
-}
-
-.product-name {
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.qty {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
 }
 
 .qty button {
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-  border: 0;
-  background: #fee2e2;
+  padding: 4px 10px;
+  border: none;
+  background: #ddd;
+  border-radius: 4px;
 }
 
-/* ADMIN TABLE */
-.adminTable {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 11px;
+.qty span {
+  margin: 0 8px;
+  font-weight: bold;
 }
-
-.adminTable th {
-  background: #f3f4f6;
-}
-
-.adminTable th,
-.adminTable td {
-  padding: 4px;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-/* BUTTONS */
-.btn {
-  width: 100%;
-  padding: 8px;
-  border-radius: 999px;
-  border: 0;
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.btn.primary {
-  background: #f97316;
-  color: white;
-}
-
-.btn.dark {
-  background: #111827;
-  color: white;
-}
-
-.btn.whatsapp {
-  background: #25D366;
-  color: white;
-}
-
-.btn.clear {
-  background: #9ca3af;
-  color: white;
-}
-
-/* DRAWER */
 
 .drawer {
   position: fixed;
   bottom: 0;
+  width: 100%;
+  background: white;
+  max-width: 600px;
   left: 50%;
   transform: translateX(-50%);
-  width: 100%;
-  max-width: 480px;
-  z-index: 20;
 }
 
-.drawer.hidden {
+.hidden {
   display: none;
 }
 
 .drawer-card {
-  background: #111827;
-  color: white;
-  border-radius: 16px 16px 0 0;
-  box-shadow: 0 -4px 12px rgba(0,0,0,0.25);
+  border-top: 2px solid #2563eb;
 }
 
 .drawer-summary {
+  padding: 12px;
   display: flex;
   justify-content: space-between;
-  padding: 8px 12px;
+  background: #eef2ff;
+  cursor: pointer;
 }
 
 .drawer-body {
-  background: #f9fafb;
+  padding: 12px;
+}
+
+.drawer-row {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0;
+}
+
+.drawer-buttons {
+  display: flex;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.btn {
+  flex: 1;
   padding: 10px;
-  border-top: 1px solid #e5e7eb;
+  border-radius: 6px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn.primary {
+  background: #2563eb;
+  color: white;
+}
+
+.btn.dark {
+  background: black;
+  color: white;
+}
+
+.btn.whatsapp {
+  background: #25d366;
+  color: white;
+}
+
+.btn.clear {
+  background: #ef4444;
+  color: white;
 }
 
 .billTable {
   width: 100%;
-  margin-top: 6px;
+  margin-top: 10px;
 }
 
-/* BUTTON ROW (4 IN ONE LINE) */
-.drawer-buttons {
-  display: flex;
-  justify-content: space-between;
-  gap: 6px;
-  margin-top: 8px;
+.billTable th, .billTable td {
+  padding: 5px;
+  text-align: left;
 }
 
-.drawer-buttons .btn {
-  flex: 1;
-  margin-top: 0;
-  font-size: 12px;
+.total {
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 10px;
 }
