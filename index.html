@@ -7,10 +7,10 @@
 
 <link rel="stylesheet" href="style.css">
 
-<!-- Required JS library for image export -->
+<!-- Required for image export -->
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-
 </head>
+
 <body>
 
 <div class="app">
@@ -30,11 +30,8 @@
   <section id="customerSection">
     <div class="card">
       <h2>Customer Details</h2>
-
-      <!-- MANDATORY CUSTOMER NAME -->
       <input id="custName" class="input" placeholder="Enter customer name" required>
-
-      <div class="small" style="margin-top:4px;">Name will appear on the bill and in shared text.</div>
+      <div class="small" style="margin-top:4px;">Name will appear on the bill.</div>
 
       <div id="nameError" style="color:red;font-size:12px;display:none;">
         Customer name is required.
@@ -44,7 +41,6 @@
     <div class="card">
       <h2>Products</h2>
       <div class="small">Tap + / − to add or remove items.</div>
-
       <div id="categoryTabs" class="catTabs"></div>
       <div id="productList"></div>
     </div>
@@ -54,19 +50,14 @@
   <section id="adminSection" style="display:none;">
     <div class="card">
       <h2>Manage Products</h2>
-
       <table id="adminTable" class="adminTable"></table>
 
       <h2 style="margin-top:10px;">Add Product</h2>
-
       <input id="pName" class="input" placeholder="Product name">
       <div style="height:6px;"></div>
-
       <input id="pCategory" class="input" placeholder="Category">
       <div style="height:6px;"></div>
-
       <input id="pPrice" class="input" placeholder="Price" type="number" min="0" step="0.01">
-
       <div style="margin-top:6px;font-size:12px;">
         <label><input type="checkbox" id="pActive" checked> Active</label>
       </div>
@@ -80,19 +71,17 @@
   <section id="historySection" style="display:none;">
     <div class="card">
       <h2>Bill History</h2>
-
       <div id="historyList" class="small" style="margin-top:6px;">No bills saved.</div>
-
       <button class="btn dark" style="margin-top:14px;" onclick="clearHistory()">Clear All History</button>
     </div>
   </section>
 
 </div>
 
-<!-- HIDDEN BILL PREVIEW (Required for Image Generation) -->
+<!-- Hidden for Image Generation -->
 <div id="billPreview" style="display:none;"></div>
 
-<!-- BOTTOM CART DRAWER -->
+<!-- DRAWER -->
 <div id="cartDrawer" class="drawer hidden">
   <div class="drawer-card">
 
@@ -120,7 +109,7 @@
         <input id="custNameDrawer" placeholder="Enter customer name" required>
       </div>
 
-      <div id="nameErrorDrawer" style="color:red;font-size:12px;display:none;margin-top:-6px;margin-bottom:8px;">
+      <div id="nameErrorDrawer" style="color:red;font-size:12px;display:none;">
         Customer name is required.
       </div>
 
@@ -132,7 +121,6 @@
             <th class="amount">Total</th>
           </tr>
         </thead>
-
         <tbody id="billBody"></tbody>
       </table>
 
@@ -141,18 +129,18 @@
         <span id="grandTotalText">₹0</span>
       </div>
 
+      <!-- FINAL BUTTON ROW -->
       <div class="drawer-buttons">
-        <button class="btn primary" onclick="downloadImage()">Save Image</button>
-        <button class="btn dark" onclick="shareImage()">Share Image</button>
-        <button class="btn" style="background:#9ca3af;color:white;" onclick="clearCart()">Clear Cart</button>
+        <button class="btn primary" onclick="downloadImage()">Save</button>
+        <button class="btn dark" onclick="shareBill()">Share</button>
+        <button class="btn whatsapp" onclick="shareToWhatsApp()">WhatsApp</button>
+        <button class="btn clear" onclick="clearCart()">Clear</button>
       </div>
 
     </div>
   </div>
 </div>
 
-<!-- MAIN SCRIPT -->
 <script src="script.js"></script>
-
 </body>
 </html>
