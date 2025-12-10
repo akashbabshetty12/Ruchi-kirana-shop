@@ -1,5 +1,5 @@
 /************** CONFIG **************/
-const ADMIN_PIN = "9033";
+const ADMIN_PIN = "1234";
 let adminUnlocked = false;
 
 /************** INITIAL DATA **************/
@@ -28,7 +28,7 @@ function normalizeProducts() {
 }
 normalizeProducts();
 
-/************** VALIDATION: CUSTOMER NAME MANDATORY **************/
+/************** VALIDATION: CUSTOMER NAME **************/
 function validateCustomerName(showError = true) {
   const name = document.getElementById("custName").value.trim();
   const drawerName = document.getElementById("custNameDrawer").value.trim();
@@ -49,24 +49,6 @@ function validateCustomerName(showError = true) {
   return true;
 }
 
-/************** HELPERS **************/
-function getTotalItems() {
-  let n = 0;
-  for (let id in cart) n += cart[id];
-  return n;
-}
-
-function formatDateTime(dt) {
-  if (!dt) return "—";
-  return dt.toLocaleString(undefined, {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit"
-  });
-}
-
 /************** CATEGORY TABS **************/
 function getCategories() {
   const set = new Set();
@@ -79,8 +61,8 @@ function renderCategoryTabs() {
   wrap.innerHTML = "";
 
   const btnAll = document.createElement("button");
-  btnAll.textContent = "All";
   btnAll.className = "catTab" + (selectedCategory === "All" ? " active" : "");
+  btnAll.textContent = "All";
   btnAll.onclick = () => {
     selectedCategory = "All";
     renderCategoryTabs();
@@ -90,8 +72,8 @@ function renderCategoryTabs() {
 
   getCategories().forEach(cat => {
     const btn = document.createElement("button");
-    btn.textContent = cat;
     btn.className = "catTab" + (selectedCategory === cat ? " active" : "");
+    btn.textContent = cat;
     btn.onclick = () => {
       selectedCategory = cat;
       renderCategoryTabs();
@@ -138,7 +120,6 @@ function renderProducts() {
 /************** UPDATE QTY **************/
 function updateQty(id, delta) {
 
-  // BLOCK adding items if customer name is empty
   if (!validateCustomerName()) {
     alert("Please enter customer name first.");
     return;
@@ -171,9 +152,7 @@ function showDrawer() {
 }
 
 function toggleDrawer() {
-
   if (!validateCustomerName()) return;
-
   if (getTotalItems() === 0) return;
 
   drawerOpen = !drawerOpen;
@@ -186,7 +165,6 @@ function toggleDrawer() {
 function hideDrawer() {
   document.getElementById("cartDrawer").classList.add("hidden");
   drawerOpen = false;
-  document.getElementById("drawerBody").style.display = "none";
 }
 
 /************** RENDER BILL **************/
@@ -245,6 +223,24 @@ document.getElementById("custNameDrawer").addEventListener("input", () => {
   validateCustomerName(false);
 });
 
+/************** HELPERS **************/
+function getTotalItems() {
+  let n = 0;
+  for (let id in cart) n += cart[id];
+  return n;
+}
+
+function formatDateTime(dt) {
+  if (!dt) return "—";
+  return dt.toLocaleString(undefined, {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
+  });
+}
+
 /************** BUILD BILL TEXT **************/
 function buildBillText() {
   const name = document.getElementById("custName").value.trim();
@@ -256,12 +252,31 @@ function buildBillText() {
 
   for (let id in cart) {
     const p = products.find(x => x.id == id);
-    const qty = cart[id];
-    text += `${p.name} x ${qty} = ₹${(p.price * qty).toFixed(2)}\n`;
+    text += `${p.name} × ${cart[id]} = ₹${(p.price * cart[id]).toFixed(2)}\n`;
   }
 
   text += `---------------------\nTOTAL: ${total}\n`;
   return text;
+}
+
+/************** SHARE TEXT (native share sheet) **************/
+async function shareBill() {
+  if (!validateCustomerName()) return alert("Enter customer name first.");
+
+  const text = buildBillText();
+
+  if (navigator.share) {
+    try {
+      return await navigator.share({
+        title: "Bill",
+        text: text
+      });
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  alert(text);
 }
 
 /************** SAVE BILL **************/
@@ -281,19 +296,6 @@ function saveBill() {
   localStorage.setItem("bills", JSON.stringify(bills));
   alert("Bill saved!");
   renderHistory();
-}
-
-/************** SHARE BILL (TEXT) **************/
-async function shareBill() {
-  if (!validateCustomerName()) return alert("Enter customer name first.");
-  if (navigator.share) {
-    await navigator.share({
-      title: "Bill",
-      text: buildBillText()
-    });
-  } else {
-    alert(buildBillText());
-  }
 }
 
 /************** HISTORY **************/
@@ -339,7 +341,7 @@ function clearHistory() {
   }
 }
 
-/************** ADMIN PANEL **************/
+/************** ADMIN **************/
 function renderAdmin() {
   const table = document.getElementById("adminTable");
   table.innerHTML = `
@@ -357,14 +359,10 @@ function renderAdmin() {
     tr.innerHTML = `
       <td><input type="text" value="${p.name}" onchange="editProduct(${i}, 'name', this.value)"></td>
       <td><input type="text" value="${p.category}" onchange="editProduct(${i}, 'category', this.value)"></td>
-      <td><input type="number" value="${p.price}" min="0" step="0.01"
-          onchange="editProduct(${i}, 'price', this.value)"></td>
-      <td style="text-align:center;">
-        <input type="checkbox" ${p.active ? "checked" : ""} 
-          onchange="editProduct(${i}, 'active', this.checked)">
-      </td>
+      <td><input type="number" value="${p.price}" onchange="editProduct(${i}, 'price', this.value)" min="0"></td>
+      <td style="text-align:center;"><input type="checkbox" ${p.active ? "checked" : ""} 
+           onchange="editProduct(${i}, 'active', this.checked)"></td>
     `;
-
     table.appendChild(tr);
   });
 }
@@ -412,7 +410,7 @@ function saveProducts() {
   alert("Products saved.");
 }
 
-/************** TAB SWITCHING **************/
+/************** TABS **************/
 const customerTab = document.getElementById("customerTab");
 const adminTab = document.getElementById("adminTab");
 const historyTab = document.getElementById("historyTab");
@@ -468,9 +466,10 @@ renderAdmin();
 renderHistory();
 
 /* ---------------------------------------------------------
-   IMAGE GENERATION + SHARE
+   IMAGE GENERATION + SAVE + WHATSAPP SHARE
 ----------------------------------------------------------*/
 
+// HTML content for bill image
 function generateBillHTML() {
   let html = `<div style='padding:20px;font-family:sans-serif;border:1px solid #ccc;width:300px;background:white;'>`;
   html += `<h2>🛒 Ruchi Kirana Shop</h2>`;
@@ -488,6 +487,7 @@ function generateBillHTML() {
   return html;
 }
 
+// Generate PNG
 async function generateBillImage() {
   if (!validateCustomerName()) return alert("Enter customer name first.");
 
@@ -495,51 +495,40 @@ async function generateBillImage() {
   billDiv.innerHTML = generateBillHTML();
   billDiv.style.display = "block";
 
-  const canvas = await html2canvas(billDiv, { scale: 3 });
-  billDiv.style.display = "none";
-
-  return canvas.toDataURL("image/png");
+  try {
+    const canvas = await html2canvas(billDiv, { scale: 2 });
+    billDiv.style.display = "none";
+    return canvas.toDataURL("image/png");
+  } catch (err) {
+    billDiv.style.display = "none";
+    alert("Image creation failed.");
+    throw err;
+  }
 }
 
+// Save (Android 11 compatible)
 async function downloadImage() {
   if (!validateCustomerName()) return alert("Enter customer name before saving.");
 
-  const img = await generateBillImage();
+  let img;
+  try {
+    img = await generateBillImage();
+  } catch {
+    return;
+  }
+
   const link = document.createElement("a");
   link.href = img;
   link.download = `Bill_${Date.now()}.png`;
   link.click();
-
-  alert("Image saved!");
 }
 
-async function shareImage() {
-  if (!validateCustomerName()) return alert("Enter customer name before sharing.");
+// WhatsApp share text only (works on all phones)
+function shareToWhatsApp() {
+  if (!validateCustomerName()) return alert("Enter customer name first.");
 
-  const img = await generateBillImage();
-  const res = await fetch(img);
-  const blob = await res.blob();
-  const file = new File([blob], "Bill.png", { type: "image/png" });
+  const text = encodeURIComponent(buildBillText());
+  const url = "https://wa.me/?text=" + text;
 
-  // ANDROID file share
-  if (navigator.canShare && navigator.canShare({ files: [file] })) {
-    try {
-      return await navigator.share({
-        title: "Bill Image",
-        files: [file]
-      });
-    } catch (err) {
-      console.log("Share failed", err);
-    }
-  }
-
-  // iPHONE fallback → share TEXT
-  if (navigator.share) {
-    return await navigator.share({
-      title: "Bill",
-      text: buildBillText()
-    });
-  }
-
-  alert("Sharing not supported on this device.");
+  window.open(url, "_blank");
 }
