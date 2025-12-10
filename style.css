@@ -18,10 +18,10 @@ body {
   display: flex;
   flex-direction: column;
   position: relative;
-  padding-bottom: 90px; /* space for drawer */
+  padding-bottom: 90px;
 }
 
-/* ---------------- HEADER ---------------- */
+/* HEADER */
 header {
   background: linear-gradient(135deg, #f97316, #fb923c);
   color: white;
@@ -36,7 +36,6 @@ header .title {
 header .subtitle {
   font-size: 12px;
   opacity: 0.9;
-  margin-top: 2px;
 }
 
 .tabs {
@@ -63,7 +62,7 @@ header .subtitle {
   font-weight: 600;
 }
 
-/* ---------------- SECTIONS ---------------- */
+/* SECTIONS */
 section {
   padding: 10px 10px 16px;
 }
@@ -91,16 +90,9 @@ section {
   padding: 7px 8px;
   border-radius: 8px;
   border: 1px solid #d1d5db;
-  font-size: 13px;
 }
 
-.input:focus {
-  outline: none;
-  border-color: #f97316;
-  box-shadow: 0 0 0 1px rgba(249,115,22,0.4);
-}
-
-/* ---------------- CATEGORY TABS ---------------- */
+/* CATEGORY TABS */
 .catTabs {
   display: flex;
   gap: 6px;
@@ -109,30 +101,23 @@ section {
   margin-bottom: 6px;
 }
 
-.catTabs::-webkit-scrollbar {
-  height: 3px;
-}
-
 .catTab {
   padding: 5px 10px;
   border-radius: 999px;
   border: 1px solid #fed7aa;
   background: white;
   font-size: 12px;
-  white-space: nowrap;
 }
 
 .catTab.active {
   background: #f97316;
   color: white;
-  border-color: #f97316;
 }
 
-/* ---------------- PRODUCT LIST ---------------- */
+/* PRODUCT LIST */
 .product {
   display: flex;
   justify-content: space-between;
-  align-items: center;
   padding: 8px;
   background: white;
   border-radius: 10px;
@@ -140,28 +125,9 @@ section {
   margin-bottom: 6px;
 }
 
-.product-info {
-  display: flex;
-  flex-direction: column;
-}
-
 .product-name {
   font-size: 14px;
   font-weight: 600;
-  color: #111827;
-}
-
-.product-cat {
-  font-size: 11px;
-  color: #6b7280;
-  margin-top: 1px;
-}
-
-.product-price {
-  font-size: 13px;
-  color: #ea580c;
-  font-weight: 600;
-  margin-top: 3px;
 }
 
 .qty {
@@ -176,25 +142,17 @@ section {
   border-radius: 999px;
   border: 0;
   background: #fee2e2;
-  font-size: 18px;
 }
 
-.qty button.plus {
-  background: #fed7aa;
-}
-
-.qty span {
-  min-width: 20px;
-  text-align: center;
-  font-weight: 600;
-  font-size: 14px;
-}
-
-/* ---------------- ADMIN TABLE ---------------- */
+/* ADMIN TABLE */
 .adminTable {
   width: 100%;
   border-collapse: collapse;
   font-size: 11px;
+}
+
+.adminTable th {
+  background: #f3f4f6;
 }
 
 .adminTable th,
@@ -203,35 +161,14 @@ section {
   border-bottom: 1px solid #e5e7eb;
 }
 
-.adminTable th {
-  background: #f3f4f6;
-  font-weight: 600;
-  color: #374151;
-}
-
-.adminTable input[type="text"],
-.adminTable input[type="number"] {
-  width: 100%;
-  padding: 4px;
-  border-radius: 6px;
-  border: 1px solid #d1d5db;
-  font-size: 11px;
-}
-
-.adminTable input[type="checkbox"] {
-  width: 14px;
-  height: 14px;
-}
-
-/* ---------------- BUTTONS ---------------- */
+/* BUTTONS */
 .btn {
   width: 100%;
-  padding: 8px 10px;
+  padding: 8px;
   border-radius: 999px;
   border: 0;
   font-size: 13px;
   font-weight: 600;
-  margin-top: 6px;
 }
 
 .btn.primary {
@@ -244,17 +181,18 @@ section {
   color: white;
 }
 
-/* ---------------- HISTORY ---------------- */
-.history-item {
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  margin-bottom: 8px;
-  font-size: 13px;
-  background: white;
+.btn.whatsapp {
+  background: #25D366;
+  color: white;
 }
 
-/* ---------------- BOTTOM DRAWER ---------------- */
+.btn.clear {
+  background: #9ca3af;
+  color: white;
+}
+
+/* DRAWER */
+
 .drawer {
   position: fixed;
   bottom: 0;
@@ -274,104 +212,30 @@ section {
   color: white;
   border-radius: 16px 16px 0 0;
   box-shadow: 0 -4px 12px rgba(0,0,0,0.25);
-  overflow: hidden;
 }
 
 .drawer-summary {
   display: flex;
   justify-content: space-between;
-  align-items: center;
   padding: 8px 12px;
-}
-
-.drawer-left {
-  display: flex;
-  flex-direction: column;
-}
-
-.drawer-title {
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.drawer-sub {
-  font-size: 11px;
-  color: #d1d5db;
-}
-
-.drawer-total {
-  font-size: 15px;
-  font-weight: 700;
-}
-
-.drawer-toggle {
-  font-size: 18px;
 }
 
 .drawer-body {
   background: #f9fafb;
-  color: #111827;
   padding: 10px;
   border-top: 1px solid #e5e7eb;
 }
 
-.drawer-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 12px;
-  margin-bottom: 4px;
-}
-
-.drawer-row span.label {
-  color: #6b7280;
-}
-
-.drawer-row span.value {
-  font-weight: 500;
-}
-
-.drawer-row input {
-  flex: 1;
-  margin-left: 6px;
-  padding: 5px 7px;
-  border-radius: 7px;
-  border: 1px solid #d1d5db;
-  font-size: 12px;
-}
-
 .billTable {
   width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
   margin-top: 6px;
 }
 
-.billTable th,
-.billTable td {
-  padding: 4px 2px;
-  border-bottom: 1px solid #e5e7eb;
-}
-
-.billTable th {
-  text-align: left;
-  color: #4b5563;
-}
-
-.billTable td.amount {
-  text-align: right;
-}
-
-.total-row {
-  font-weight: 600;
-  margin-top: 6px;
-}
-
-/* ---------------- BOTTOM BUTTON ROW (Fixed) ---------------- */
+/* BUTTON ROW (4 IN ONE LINE) */
 .drawer-buttons {
   display: flex;
   justify-content: space-between;
-  gap: 8px;
+  gap: 6px;
   margin-top: 8px;
 }
 
@@ -379,12 +243,4 @@ section {
   flex: 1;
   margin-top: 0;
   font-size: 12px;
-  text-align: center;
-}
-
-/* ---------------- RESPONSIVE ---------------- */
-@media (max-width: 360px) {
-  header .title {
-    font-size: 18px;
-  }
 }
