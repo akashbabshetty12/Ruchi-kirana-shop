@@ -1,7 +1,3 @@
-/************** CONFIG **************/
-const ADMIN_PIN = "1234";
-let adminUnlocked = false;
-
 /************** INITIAL DATA **************/
 let products = JSON.parse(localStorage.getItem("products")) || [
   { id: 1, name: "Rice", category: "Staples", price: 60, active: true },
@@ -15,6 +11,34 @@ let cart = {};
 let selectedCategory = "All";
 let drawerOpen = false;
 let currentBillDate = null;
+
+/************** LOAD jsPDF (NO HTML CHANGE NEEDED) **************/
+const jsPdfScript = document.createElement("script");
+jsPdfScript.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
+document.head.appendChild(jsPdfScript);
+
+/************** DEVICE-BASED ADMIN PIN (ALWAYS ASK) **************/
+let savedAdminPin = localStorage.getItem("adminPin");
+
+function requestAdminPin() {
+  if (!savedAdminPin) {
+    const newPin = prompt("Set new Admin PIN:");
+    if (!newPin || newPin.trim() === "") {
+      alert("PIN not set.");
+      return false;
+    }
+    localStorage.setItem("adminPin", newPin);
+    savedAdminPin = newPin;
+    alert("Admin PIN created successfully!");
+    return true;
+  }
+
+  const entered = prompt("Enter Admin PIN:");
+  if (entered === savedAdminPin) return true;
+
+  alert("Incorrect PIN.");
+  return false;
+}
 
 /************** NORMALIZE PRODUCTS **************/
 function normalizeProducts() {
@@ -263,7 +287,7 @@ function formatDateTime(dt) {
   });
 }
 
-/************** BUILD BILL TEXT (Used for WhatsApp fallback) **************/
+/************** BILL TEXT (WHATSAPP SHARE) **************/
 function buildBillText() {
   const name = (document.getElementById("custName")?.value || "").trim();
   const total = document.getElementById("grandTotalText")?.textContent || "₹0";
@@ -282,7 +306,7 @@ function buildBillText() {
   return text;
 }
 
-/************** SAVE BILL (history only) **************/
+/************** SAVE BILL HISTORY **************/
 function saveBillToHistory() {
   if (!validateCustomerName()) return alert("Enter customer name.");
 
@@ -352,7 +376,6 @@ function clearHistory() {
   }
 }
 
-/* Recreate a bill back into cart (load) */
 function recreateBill(id) {
   const bills = JSON.parse(localStorage.getItem("bills") || "[]");
   const bill = bills.find(b => b.id === id);
@@ -371,7 +394,7 @@ function recreateBill(id) {
   showDrawer();
 }
 
-/************** ADMIN **************/
+/************** ADMIN SECTION **************/
 function renderAdmin() {
   const table = document.getElementById("adminTable");
   if (!table) return;
@@ -463,12 +486,7 @@ if (customerTab) {
 
 if (adminTab) {
   adminTab.onclick = () => {
-    if (!adminUnlocked) {
-      const pin = prompt("Enter Admin PIN (default 1234)");
-      if (pin !== ADMIN_PIN) return alert("Incorrect PIN.");
-      adminUnlocked = true;
-      alert("Admin unlocked.");
-    }
+    if (!requestAdminPin()) return;
 
     if (adminSection) adminSection.style.display = "block";
     if (customerSection) customerSection.style.display = "none";
@@ -477,6 +495,8 @@ if (adminTab) {
     adminTab.classList.add("active");
     if (customerTab) customerTab.classList.remove("active");
     if (historyTab) historyTab.classList.remove("active");
+
+    renderAdmin();
   };
 }
 
@@ -502,153 +522,65 @@ renderAdmin();
 renderHistory();
 
 /* ---------------------------------------------------------
-   IMAGE GENERATION + SAVE + WHATSAPP SHARE (FIXED)
+      PNG REMOVED — PDF SAVE ADDED
 ----------------------------------------------------------*/
 
-/*** Generate Bill HTML for capture ***/
-function generateBillHTML() {
-  let html = `<div style='padding:20px;font-family:sans-serif;border:1px solid #ccc;width:320px;background:white;color:#111;'>`;
-  html += `<h2 style="margin:0 0 8px 0;">🛒 Ruchi Kirana Shop</h2>`;
-  html += `<div style="font-size:13px;margin-bottom:6px;">Date: ${formatDateTime(currentBillDate || new Date())}</div>`;
-  html += `<div style="font-size:13px;margin-bottom:6px;">Customer: ${(document.getElementById("custName")?.value || "").trim()}</div>`;
-  html += `<hr style="border:none;border-top:1px solid #eee;margin:8px 0;">`;
+async function downloadImage() {
+  if (!validateCustomerName()) {
+    alert("Enter customer name first.");
+    return;
+  }
+
+  if (!window.jspdf) {
+    await new Promise(resolve => jsPdfScript.onload = resolve);
+  }
+
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF();
+  let y = 10;
+
+  pdf.setFontSize(16);
+  pdf.text("Ruchi Kirana Shop", 10, y);
+  y += 10;
+
+  pdf.setFontSize(11);
+  pdf.text("Date: " + formatDateTime(currentBillDate || new Date()), 10, y);
+  y += 6;
+
+  let cust = (document.getElementById("custName")?.value || "").trim();
+  pdf.text("Customer: " + cust, 10, y);
+  y += 10;
+
+  pdf.setLineWidth(0.3);
+  pdf.line(10, y, 200, y);
+  y += 8;
+
+  pdf.setFontSize(12);
 
   for (let id in cart) {
     const p = products.find(x => x.id == id);
     if (!p) continue;
-    html += `<div style="display:flex;justify-content:space-between;font-size:13px;margin:4px 0;">
-               <span>${p.name} × ${cart[id]}</span>
-               <strong>₹${(p.price * cart[id]).toFixed(2)}</strong>
-             </div>`;
+
+    pdf.text(`${p.name} × ${cart[id]}`, 10, y);
+    pdf.text(`₹${(p.price * cart[id]).toFixed(2)}`, 200 - 10, y, { align: "right" });
+    y += 7;
   }
 
-  html += `<hr style="border:none;border-top:1px solid #eee;margin:8px 0;">`;
-  html += `<h3 style="margin:6px 0 0 0;">Total: ${document.getElementById("grandTotalText")?.textContent || "₹0"}</h3>`;
-  html += `</div>`;
-  return html;
+  y += 4;
+  pdf.line(10, y, 200, y);
+  y += 10;
+
+  pdf.setFontSize(14);
+  const total = document.getElementById("grandTotalText")?.textContent || "₹0";
+  pdf.text("Total: " + total, 10, y);
+
+  saveBillToHistory();
+
+  pdf.save(`Bill_${Date.now()}.pdf`);
+  alert("PDF saved successfully!");
 }
 
-/*** Create PNG blob using html2canvas ***/
-async function generateBillBlob() {
-  if (!validateCustomerName()) throw new Error("Enter customer name first.");
-
-  if (typeof html2canvas !== "function") {
-    throw new Error("html2canvas is not loaded. Please include html2canvas library.");
-  }
-
-  const billDiv = document.getElementById("billPreview");
-  if (!billDiv) throw new Error("Missing #billPreview element.");
-
-  billDiv.innerHTML = generateBillHTML();
-  billDiv.style.display = "block";
-
-  try {
-    const canvas = await html2canvas(billDiv, { scale: 2 });
-    const blob = await new Promise(res => canvas.toBlob(res, "image/png"));
-    return blob;
-  } finally {
-    billDiv.style.display = "none";
-    billDiv.innerHTML = "";
-  }
-}
-
-/*** SAVE / DOWNLOAD PNG ***/
-async function downloadImage() {
-  try {
-    const blob = await generateBillBlob();
-    saveBillToHistory(); // save into history on user download
-
-    // Preferred: use File System Access API if available (desktop chromium)
-    if (window.showSaveFilePicker) {
-      try {
-        const opts = {
-          types: [
-            {
-              description: "PNG image",
-              accept: { "image/png": [".png"] }
-            }
-          ]
-        };
-        const handle = await window.showSaveFilePicker(opts);
-        const writable = await handle.createWritable();
-        await writable.write(blob);
-        await writable.close();
-        alert("Saved successfully.");
-        return;
-      } catch (err) {
-        // user cancelled or API failed -> fallback to anchor download
-        console.warn("showSaveFilePicker failed or cancelled:", err);
-      }
-    }
-
-    // Anchor fallback for mobile & desktop
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `Bill_${Date.now()}.png`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 10000);
-    alert("Download started.");
-  } catch (err) {
-    console.error(err);
-    alert(err.message || "Failed to save image.");
-  }
-}
-
-/*** SHARE IMAGE USING NATIVE SHARE SHEET ***/
-async function shareImage() {
-  try {
-    const blob = await generateBillBlob();
-    saveBillToHistory();
-
-    const file = new File([blob], `Bill_${Date.now()}.png`, { type: "image/png" });
-
-    // Use navigator.canShare where available
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      try {
-        await navigator.share({
-          files: [file],
-          title: "Bill - Ruchi Kirana Shop",
-          text: buildBillText()
-        });
-        return;
-      } catch (err) {
-        console.warn("navigator.share with files failed:", err);
-        // fall through to other attempts
-      }
-    }
-
-    // Some browsers support share without canShare
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          files: [file],
-          title: "Bill - Ruchi Kirana Shop",
-          text: buildBillText()
-        });
-        return;
-      } catch (err) {
-        console.warn("navigator.share attempt failed:", err);
-      }
-    }
-
-    // Fallback to WhatsApp text share if file share not available
-    alert("Image sharing not supported on this device. Using text fallback.");
-    shareToWhatsAppText();
-
-  } catch (err) {
-    console.error(err);
-    if (err.message && err.message.includes("html2canvas")) {
-      alert("Image generation failed. Make sure html2canvas library is included.");
-    } else {
-      alert("Sharing failed.");
-    }
-  }
-}
-
-/*** WhatsApp fallback (text only) ***/
+/************** WHATSAPP SHARE FALLBACK **************/
 function shareToWhatsAppText() {
   if (!validateCustomerName()) return alert("Enter customer name first.");
   const text = encodeURIComponent(buildBillText());
@@ -656,7 +588,5 @@ function shareToWhatsAppText() {
   window.open(url, "_blank", "noopener");
 }
 
-/*** Expose functions for HTML onclick bindings ***/
 window.downloadImage = downloadImage;
-window.shareImage = shareImage;
 window.shareToWhatsAppText = shareToWhatsAppText;
