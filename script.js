@@ -334,8 +334,7 @@ function buildBillText() {
     text += `${p.name} × ${cart[id]} = ₹${(p.price * cart[id]).toFixed(2)}\n`;
   }
 
-  text += `---------------------\n 💰 TOTAL: ${total}\n`;
-  text = `🙏 Thank you! Visit Again\n`;
+  text += `---------------------\n 💰 TOTAL: ${total}\n 🙏 Thank you! Visit Again`;
   return text;
 }
 
@@ -704,3 +703,4 @@ function shareToWhatsAppText() {
 window.downloadImage = downloadImage;
 window.shareImage = shareImage;
 window.shareToWhatsAppText = shareToWhatsAppText;
+
