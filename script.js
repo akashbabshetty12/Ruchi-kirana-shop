@@ -1,10 +1,43 @@
 /************** INITIAL DATA **************/
 let products = JSON.parse(localStorage.getItem("products")) || [
-  { id: 1, name: "Rice", category: "Staples", price: 60, active: true },
-  { id: 2, name: "Oil", category: "Oil", price: 140, active: true },
-  { id: 3, name: "Sugar", category: "Staples", price: 50, active: true },
-  { id: 4, name: "Biscuits", category: "Snacks", price: 20, active: true },
-  { id: 5, name: "Cold Drink", category: "Beverages", price: 35, active: true }
+ { id: 1, name: "Gold Flake", category: "Cigarette", price: 60, active: true },
+ { id: 2, name: "Bristol", category: "Cigarette", price: 140, active: true },
+ { id: 3, name: "Gold Flake king", category: "Cigarette", price: 50, active: true },
+ { id: 4, name: "Gold Flake Lites", category: "Cigarette", price: 20, active: true },
+ { id: 5, name: "Players", category: "Cigarette", price: 35, active: true },
+ { id: 6, name: "Indiment", category: "Cigarette", price: 140, active: true },
+ { id: 7, name: "Garam", category: "Cigarette", price: 50, active: true },
+ { id: 8, name: "Black", category: "Cigarette", price: 20, active: true },
+ { id: 9, name: "Ganesh", category: "Cigarette", price: 35, active: true },
+ { id: 10, name: "Mahesh", category: "Cigarette", price: 140, active: true },
+ { id: 11, name: "100 Bidi", category: "Cigarette", price: 50, active: true },
+ { id: 12, name: "Vimal", category: "Pan Masala", price: 20, active: true },
+ { id: 13, name: "RR", category: "Pan Masala", price: 35, active: true },
+ { id: 14, name: "Super", category: "Pan Masala", price: 140, active: true },
+ { id: 15, name: "Baba", category: "Pan Masala", price: 50, active: true },
+ { id: 16, name: "RMD B(1 Pc)", category: "Pan Masala", price: 20, active: true },
+ { id: 17, name: "RMD S(1 Pc)", category: "Pan Masala", price: 35, active: true },
+ { id: 18, name: "Elichi", category: "Pan Masala", price: 50, active: true },
+ { id: 19, name: "7 star", category: "Pan Masala", price: 20, active: true },
+ { id: 20, name: "sony", category: "Pan Masala", price: 35, active: true },
+ { id: 21, name: "chali adki", category: "Pan Masala", price: 50, active: true },
+ { id: 22, name: "Dal", category: "Pan Masala", price: 20, active: true },
+ { id: 23, name: "Raju", category: "Pan Masala", price: 35, active: true },
+ { id: 24, name: "Sazan", category: "Pan Masala", price: 20, active: true },
+ { id: 25, name: "Patanjali", category: "Biscuits", price: 35, active: true },
+ { id: 26, name: "Krackjack", category: "Biscuits", price: 35, active: true },
+ { id: 27, name: "Bourbon Dark", category: "Biscuits", price: 35, active: true },
+ { id: 28, name: "20-20", category: "Biscuits", price: 35, active: true },
+ { id: 29, name: "Good Day", category: "Biscuits", price: 35, active: true },
+ { id: 30, name: "Parle-Gold", category: "Biscuits", price: 35, active: true },
+ { id: 31, name: "Marie Gold", category: "Biscuits", price: 35, active: true },
+ { id: 32, name: "Happy Happy", category: "Biscuits", price: 35, active: true },
+ { id: 33, name: "Monnacco", category: "Biscuits", price: 35, active: true },
+ { id: 34, name: "Hide & Seek", category: "Biscuits", price: 35, active: true },
+ { id: 35, name: "Bourbon", category: "Biscuits", price: 35, active: true },
+ { id: 36, name: "Jim Jam", category: "Biscuits", price: 35, active: true },
+ { id: 37, name: "Dark Fantasy", category: "Biscuits", price: 35, active: true },
+ { id: 38, name: "Oreo", category: "Biscuits", price: 35, active: true }
 ];
 
 let cart = {};
@@ -12,15 +45,11 @@ let selectedCategory = "All";
 let drawerOpen = false;
 let currentBillDate = null;
 
-/************** LOAD jsPDF (NO HTML CHANGE NEEDED) **************/
-const jsPdfScript = document.createElement("script");
-jsPdfScript.src = "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
-document.head.appendChild(jsPdfScript);
-
 /************** DEVICE-BASED ADMIN PIN (ALWAYS ASK) **************/
 let savedAdminPin = localStorage.getItem("adminPin");
 
 function requestAdminPin() {
+  // FIRST TIME → CREATE PIN
   if (!savedAdminPin) {
     const newPin = prompt("Set new Admin PIN:");
     if (!newPin || newPin.trim() === "") {
@@ -33,8 +62,11 @@ function requestAdminPin() {
     return true;
   }
 
+  // EVERY TIME → ASK FOR PIN
   const entered = prompt("Enter Admin PIN:");
-  if (entered === savedAdminPin) return true;
+  if (entered === savedAdminPin) {
+    return true;
+  }
 
   alert("Incorrect PIN.");
   return false;
@@ -287,14 +319,14 @@ function formatDateTime(dt) {
   });
 }
 
-/************** BILL TEXT (WHATSAPP SHARE) **************/
+/************** BILL TEXT FOR WHATSAPP **************/
 function buildBillText() {
   const name = (document.getElementById("custName")?.value || "").trim();
   const total = document.getElementById("grandTotalText")?.textContent || "₹0";
   const date = formatDateTime(currentBillDate || new Date());
 
-  let text = `Ruchi Kirana Shop - Bill\n`;
-  text += `Date: ${date}\nCustomer: ${name}\n---------------------\n`;
+  let text = `🧾 *RUCHI KIRANA SHOP* - Bill\n`;
+  text += `📅 Date: ${date}\n 👤 Customer: ${name}\n---------------------\n`;
 
   for (let id in cart) {
     const p = products.find(x => x.id == id);
@@ -302,7 +334,8 @@ function buildBillText() {
     text += `${p.name} × ${cart[id]} = ₹${(p.price * cart[id]).toFixed(2)}\n`;
   }
 
-  text += `---------------------\nTOTAL: ${total}\n`;
+  text += `---------------------\n 💰 TOTAL: ${total}\n`;
+  text = `🙏 Thank you! Visit Again\n`;
   return text;
 }
 
@@ -394,7 +427,7 @@ function recreateBill(id) {
   showDrawer();
 }
 
-/************** ADMIN SECTION **************/
+/************** ADMIN SECTION RENDER **************/
 function renderAdmin() {
   const table = document.getElementById("adminTable");
   if (!table) return;
@@ -472,6 +505,7 @@ const customerSection = document.getElementById("customerSection");
 const adminSection = document.getElementById("adminSection");
 const historySection = document.getElementById("historySection");
 
+/*** CUSTOMER TAB ***/
 if (customerTab) {
   customerTab.onclick = () => {
     if (customerSection) customerSection.style.display = "block";
@@ -484,8 +518,10 @@ if (customerTab) {
   };
 }
 
+/*** ADMIN TAB — ALWAYS ASK PIN ***/
 if (adminTab) {
   adminTab.onclick = () => {
+
     if (!requestAdminPin()) return;
 
     if (adminSection) adminSection.style.display = "block";
@@ -500,6 +536,7 @@ if (adminTab) {
   };
 }
 
+/*** HISTORY TAB ***/
 if (historyTab) {
   historyTab.onclick = () => {
     if (historySection) historySection.style.display = "block";
@@ -522,65 +559,141 @@ renderAdmin();
 renderHistory();
 
 /* ---------------------------------------------------------
-      PNG REMOVED — PDF SAVE ADDED
+   IMAGE GENERATION + SAVE + WHATSAPP SHARE (FIXED)
 ----------------------------------------------------------*/
 
-async function downloadImage() {
-  if (!validateCustomerName()) {
-    alert("Enter customer name first.");
-    return;
-  }
-
-  if (!window.jspdf) {
-    await new Promise(resolve => jsPdfScript.onload = resolve);
-  }
-
-  const { jsPDF } = window.jspdf;
-  const pdf = new jsPDF();
-  let y = 10;
-
-  pdf.setFontSize(16);
-  pdf.text("Ruchi Kirana Shop", 10, y);
-  y += 10;
-
-  pdf.setFontSize(11);
-  pdf.text("Date: " + formatDateTime(currentBillDate || new Date()), 10, y);
-  y += 6;
-
-  let cust = (document.getElementById("custName")?.value || "").trim();
-  pdf.text("Customer: " + cust, 10, y);
-  y += 10;
-
-  pdf.setLineWidth(0.3);
-  pdf.line(10, y, 200, y);
-  y += 8;
-
-  pdf.setFontSize(12);
+function generateBillHTML() {
+  let html = `<div style='padding:20px;font-family:sans-serif;border:1px solid #ccc;width:320px;background:white;color:#111;'>`;
+  html += `<h2 style="margin:0 0 8px 0;">🛒 Ruchi Kirana Shop</h2>`;
+  html += `<div style="font-size:13px;margin-bottom:6px;">Date: ${formatDateTime(currentBillDate || new Date())}</div>`;
+  html += `<div style="font-size:13px;margin-bottom:6px;">Customer: ${(document.getElementById("custName")?.value || "").trim()}</div>`;
+  html += `<hr style="border:none;border-top:1px solid #eee;margin:8px 0;">`;
 
   for (let id in cart) {
     const p = products.find(x => x.id == id);
     if (!p) continue;
-
-    pdf.text(`${p.name} × ${cart[id]}`, 10, y);
-    pdf.text(`₹${(p.price * cart[id]).toFixed(2)}`, 200 - 10, y, { align: "right" });
-    y += 7;
+    html += `<div style="display:flex;justify-content:space-between;font-size:13px;margin:4px 0;">
+               <span>${p.name} × ${cart[id]}</span>
+               <strong>₹${(p.price * cart[id]).toFixed(2)}</strong>
+             </div>`;
   }
 
-  y += 4;
-  pdf.line(10, y, 200, y);
-  y += 10;
-
-  pdf.setFontSize(14);
-  const total = document.getElementById("grandTotalText")?.textContent || "₹0";
-  pdf.text("Total: " + total, 10, y);
-
-  saveBillToHistory();
-
-  pdf.save(`Bill_${Date.now()}.pdf`);
-  alert("PDF saved successfully!");
+  html += `<hr style="border:none;border-top:1px solid #eee;margin:8px 0;">`;
+  html += `<h3 style="margin:6px 0 0 0;">Total: ${document.getElementById("grandTotalText")?.textContent || "₹0"}</h3>`;
+  html += `</div>`;
+  return html;
 }
 
-/************** WHATSAPP SHARE FALLBACK **************/
+async function generateBillBlob() {
+  if (!validateCustomerName()) throw new Error("Enter customer name first.");
+
+  if (typeof html2canvas !== "function") {
+    throw new Error("html2canvas is not loaded. Please include html2canvas library.");
+  }
+
+  const billDiv = document.getElementById("billPreview");
+  if (!billDiv) throw new Error("Missing #billPreview element.");
+
+  billDiv.innerHTML = generateBillHTML();
+  billDiv.style.display = "block";
+
+  try {
+    const canvas = await html2canvas(billDiv, { scale: 2 });
+    const blob = await new Promise(res => canvas.toBlob(res, "image/png"));
+    return blob;
+  } finally {
+    billDiv.style.display = "none";
+    billDiv.innerHTML = "";
+  }
+}
+
+async function downloadImage() {
+  try {
+    const blob = await generateBillBlob();
+    saveBillToHistory();
+
+    if (window.showSaveFilePicker) {
+      try {
+        const opts = {
+          types: [
+            {
+              description: "PNG image",
+              accept: { "image/png": [".png"] }
+            }
+          ]
+        };
+        const handle = await window.showSaveFilePicker(opts);
+        const writable = await handle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+        alert("Saved successfully.");
+        return;
+      } catch (err) {
+        console.warn("showSaveFilePicker failed or cancelled:", err);
+      }
+    }
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Bill_${Date.now()}.png`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    alert("Download started.");
+  } catch (err) {
+    console.error(err);
+    alert(err.message || "Failed to save image.");
+  }
+}
+
+async function shareImage() {
+  try {
+    const blob = await generateBillBlob();
+    saveBillToHistory();
+
+    const file = new File([blob], `Bill_${Date.now()}.png`, { type: "image/png" });
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: "Bill - Ruchi Kirana Shop",
+          text: buildBillText()
+        });
+        return;
+      } catch (err) {
+        console.warn("navigator.share with files failed:", err);
+      }
+    }
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: "Bill - Ruchi Kirana Shop",
+          text: buildBillText()
+        });
+        return;
+      } catch (err) {
+        console.warn("navigator.share attempt failed:", err);
+      }
+    }
+
+    alert("Image sharing not supported on this device. Using text fallback.");
+    shareToWhatsAppText();
+
+  } catch (err) {
+    console.error(err);
+    if (err.message && err.message.includes("html2canvas")) {
+      alert("Image generation failed. Make sure html2canvas library is included.");
+    } else {
+      alert("Sharing failed.");
+    }
+  }
+}
+
 function shareToWhatsAppText() {
   if (!validateCustomerName()) return alert("Enter customer name first.");
   const text = encodeURIComponent(buildBillText());
@@ -589,4 +702,5 @@ function shareToWhatsAppText() {
 }
 
 window.downloadImage = downloadImage;
+window.shareImage = shareImage;
 window.shareToWhatsAppText = shareToWhatsAppText;
