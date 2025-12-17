@@ -562,26 +562,59 @@ renderHistory();
 ----------------------------------------------------------*/
 
 function generateBillHTML() {
-  let html = `<div style='padding:20px;font-family:sans-serif;border:1px solid #ccc;width:320px;background:white;color:#111;'>`;
-  html += `<h2 style="margin:0 0 8px 0;">🛒 Ruchi Kirana Shop</h2>`;
-  html += `<div style="font-size:13px;margin-bottom:6px;">Date: ${formatDateTime(currentBillDate || new Date())}</div>`;
-  html += `<div style="font-size:13px;margin-bottom:6px;">Customer: ${(document.getElementById("custName")?.value || "").trim()}</div>`;
-  html += `<hr style="border:none;border-top:1px solid #eee;margin:8px 0;">`;
+  let h = `
+  <div style="
+    width:320px;
+    padding:16px;
+    font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;
+    background:white;
+    color:#111;
+    border-radius:12px;
+  ">
+    <h2 style="margin:0 0 4px 0;">🛒 Ruchi Kirana Shop</h2>
+    <div style="font-size:12px;color:#555;">🧾 Bill Receipt</div>
+
+    <div style="margin-top:10px;font-size:13px;">
+      📅 <b>Date:</b> ${formatDateTime(currentBillDate || new Date())}<br>
+      👤 <b>Customer:</b> ${(document.getElementById("custName")?.value || "").trim()}
+    </div>
+
+    <hr style="margin:10px 0;border:none;border-top:1px dashed #ccc;">
+
+    <div style="font-size:13px;">
+  `;
 
   for (let id in cart) {
     const p = products.find(x => x.id == id);
     if (!p) continue;
-    html += `<div style="display:flex;justify-content:space-between;font-size:13px;margin:4px 0;">
-               <span>${p.name} × ${cart[id]}</span>
-               <strong>₹${(p.price * cart[id]).toFixed(2)}</strong>
-             </div>`;
+
+    h += `
+      <div style="display:flex;justify-content:space-between;margin:4px 0;">
+        <span>🧮 ${p.name} × ${cart[id]}</span>
+        <b>₹${(p.price * cart[id]).toFixed(2)}</b>
+      </div>
+    `;
   }
 
-  html += `<hr style="border:none;border-top:1px solid #eee;margin:8px 0;">`;
-  html += `<h3 style="margin:6px 0 0 0;">Total: ${document.getElementById("grandTotalText")?.textContent || "₹0"}</h3>`;
-  html += `</div>`;
-  return html;
+  h += `
+    </div>
+
+    <hr style="margin:10px 0;border:none;border-top:1px dashed #ccc;">
+
+    <div style="display:flex;justify-content:space-between;font-size:15px;">
+      <b>💰 Total</b>
+      <b>${document.getElementById("grandTotalText")?.textContent || "₹0"}</b>
+    </div>
+
+    <div style="text-align:center;margin-top:12px;font-size:12px;color:#555;">
+      🙏 Thank you! Visit again 😊
+    </div>
+  </div>
+  `;
+
+  return h;
 }
+
 
 async function generateBillBlob() {
   if (!validateCustomerName()) throw new Error("Enter customer name first.");
@@ -703,3 +736,4 @@ function shareToWhatsAppText() {
 window.downloadImage = downloadImage;
 window.shareImage = shareImage;
 window.shareToWhatsAppText = shareToWhatsAppText;
+
