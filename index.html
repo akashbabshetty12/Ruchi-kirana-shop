@@ -1,16 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Ruchi Kirana Shop</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Ruchi Kirana Shop</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css">
 
-  <!-- jsPDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<!-- Image export library -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
 </head>
-
 <body>
 
 <div class="app">
@@ -30,10 +30,12 @@
     <div class="card">
       <h2>Customer Details</h2>
       <input id="custName" class="input" placeholder="Enter customer name">
+      <div class="small" style="margin-top:4px;">Name will appear on the bill and in shared text.</div>
     </div>
 
     <div class="card">
       <h2>Products</h2>
+      <div class="small">Tap + / − to add or remove items.</div>
       <div id="categoryTabs" class="catTabs"></div>
       <div id="productList"></div>
     </div>
@@ -45,12 +47,15 @@
       <h2>Manage Products</h2>
       <table id="adminTable" class="adminTable"></table>
 
-      <h2>Add Product</h2>
+      <h2 style="margin-top:10px;">Add Product</h2>
       <input id="pName" class="input" placeholder="Product name">
+      <div style="height:6px;"></div>
       <input id="pCategory" class="input" placeholder="Category">
-      <input id="pPrice" class="input" type="number" placeholder="Price">
-      <label><input type="checkbox" id="pActive" checked> Active</label>
-
+      <div style="height:6px;"></div>
+      <input id="pPrice" class="input" placeholder="Price" type="number" min="0" step="0.01">
+      <div style="margin-top:6px;font-size:12px;">
+        <label><input type="checkbox" id="pActive" checked> Active</label>
+      </div>
       <button class="btn primary" onclick="addProduct()">Add Product</button>
       <button class="btn dark" onclick="saveProducts()">Save Products</button>
     </div>
@@ -60,68 +65,65 @@
   <section id="historySection" style="display:none;">
     <div class="card">
       <h2>Bill History</h2>
-      <div id="historyList">No bills saved.</div>
-      <button class="btn dark" onclick="clearHistory()">Clear History</button>
+      <div id="historyList" class="small" style="margin-top:6px;">No bills saved.</div>
+      <button class="btn dark" style="margin-top:14px;" onclick="clearHistory()">Clear All History</button>
     </div>
   </section>
 
 </div>
 
+<!-- Hidden Bill Preview for Image Export -->
+<div id="billPreview" style="display:none;"></div>
+
 <!-- BOTTOM CART -->
 <div id="cartDrawer" class="drawer hidden">
   <div class="drawer-card">
-
     <div class="drawer-summary" onclick="toggleDrawer()">
-      <div>
+      <div class="drawer-left">
         <div class="drawer-title">View Bill</div>
-        <div id="drawerItems">0 items selected</div>
+        <div id="drawerItems" class="drawer-sub">0 items selected</div>
       </div>
-      <div id="drawerTotal">₹0</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div id="drawerTotal" class="drawer-total">₹0</div>
+        <div id="drawerToggleIcon" class="drawer-toggle">▲</div>
+      </div>
     </div>
 
     <div id="drawerBody" class="drawer-body" style="display:none;">
+      <div class="drawer-row">
+        <span class="label">Billing Date</span>
+        <span id="billingDate" class="value">—</span>
+      </div>
+      <div class="drawer-row">
+        <span class="label">Customer</span>
+        <input id="custNameDrawer" placeholder="Enter customer name">
+      </div>
 
-  <div class="drawer-row">
-    <span class="label">Billing Date</span>
-    <span id="billingDate" class="value">—</span>
-  </div>
+      <table id="billTable" class="billTable">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th style="width:40px;">Qty</th>
+            <th class="amount">Total</th>
+          </tr>
+        </thead>
+        <tbody id="billBody"></tbody>
+      </table>
 
-  <div class="drawer-row">
-    <span class="label">Customer</span>
-    <input id="custNameDrawer" placeholder="Enter customer name">
-  </div>
+      <div class="drawer-row total-row">
+        <span>Total</span>
+        <span id="grandTotalText">₹0</span>
+      </div>
 
-  <table id="billTable" class="billTable">
-    <thead>
-      <tr>
-        <th>Item</th>
-        <th style="width:40px;">Qty</th>
-        <th class="amount">Total</th>
-      </tr>
-    </thead>
-    <tbody id="billBody"></tbody>
-  </table>
-
-  <div class="drawer-row total-row">
-    <span>Total</span>
-    <span id="grandTotalText">₹0</span>
-  </div>
-
-  <div class="drawer-buttons">
-    <!-- SAME BUTTON, ONLY FUNCTION LOGIC CHANGED -->
-    <button class="btn primary" onclick="downloadImage()">Save Bill</button>
-    <button class="btn dark" onclick="shareImage()">Share Bill</button>
-    <button class="btn" style="background:#9ca3af;color:white;" onclick="clearCart()">Clear Cart</button>
-  </div>
-
-</div>
-
-
+      <div class="drawer-buttons">
+        <button class="btn primary" onclick="downloadImage()">Save Image</button>
+        <button class="btn dark" onclick="shareImage()">Share Image</button>
+        <button class="btn" style="background:#9ca3af;color:white;" onclick="clearCart()">Clear Cart</button>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- ✅ LOAD YOUR JS -->
 <script src="script.js"></script>
-
 </body>
 </html>
