@@ -344,12 +344,13 @@ function buildBillText() {
   const billNo = String(localStorage.getItem("billNo") || "123").padStart(6, "0");
 
   let text = "";
-  text += "🛒 Ruchi Kirana Shop\n";
-  text += "Best Prices. Everyday Essentials\n";
-  text += "--------------------------------\n";
-  text += `📅 Date : ${date}\n`;
-  text += `👤 Customer : ${name}\n`;
-  text += `🧾 Bill No : ${billNo}\n`;
+    text += "+--------------------------------+\n";
+  text += "|     Ruchi Kirana Shop          |\n";
+  text += "|  Best Prices. Everyday Needs   |\n";
+  text += "+--------------------------------+\n";
+  text += `:: Date : ${date}\n`;
+  text += `>> Customer : ${name}\n`;
+  text += `## Bill No : ${billNo}\n`;
   text += "--------------------------------\n";
   text += "Item                Qty     Amount\n";
   text += "--------------------------------\n";
@@ -372,10 +373,10 @@ function buildBillText() {
   }
 
   text += "--------------------------------\n";
-  text += `💰 TOTAL AMOUNT             ₹${total.toFixed(2)}\n`;
+  text += `=> TOTAL AMOUNT             ₹${total.toFixed(2)}\n`;
   text += "--------------------------------\n";
-  text += "🙏 Thank you for shopping!\n";
-  text += "Please visit again 🙂\n";
+  text += " Thank you for shopping!\n";
+  text += "Please visit again :)\n";
 
   return text;
 }
@@ -746,4 +747,5 @@ function shareToWhatsAppText() {
 window.downloadImage = downloadImage;
 window.shareImage = shareImage;
 window.shareToWhatsAppText = shareToWhatsAppText;
+
 
