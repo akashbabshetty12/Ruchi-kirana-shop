@@ -320,12 +320,13 @@ function formatDateTime(dt) {
 }
 
 /************** BILL TEXT FOR WHATSAPP **************/
-/*function buildBillText() {
+function buildBillText() {
   const name = (document.getElementById("custName")?.value || "").trim();
   const total = document.getElementById("grandTotalText")?.textContent || "₹0";
   const date = formatDateTime(currentBillDate || new Date());
 
-  let text = `Ruchi Kirana Shop - Bill\n`;
+  let text = `>>> Ruchi Kirana Shop <<<\n`;
+      text += `Best Prices. Everyday Needs\n`;
   text += `Date: ${date}\nCustomer: ${name}\n---------------------\n`;
 
   for (let id in cart) {
@@ -335,63 +336,9 @@ function formatDateTime(dt) {
   }
 
   text += `---------------------\nTOTAL: ${total}\n`;
-  return text;
-} */
 
-function buildBillText() {
-  const name =
-    (document.getElementById("custName")?.value || "").trim() || "-";
-  const date = formatDateTime(currentBillDate || new Date());
-
-  let text = "";
-
-  // ===== HEADER =====
-  text += "-----------------------------------------------\n";
-  text += "  >>> Ruchi Kirana Shop <<<\n";
-  text += "  Best Prices. Everyday Needs\n";
-  text += "-----------------------------------------------\n";
-
-  // ===== BILL INFO =====
-  text += "Date     : " + date + "\n";
-  text += "Customer : " + name + "\n\n";
-
-  // ===== START MONOSPACE (IMPORTANT) =====
-  text += "```" + "\n";
-
-  // ===== ITEM HEADER =====
-  text += "Item                Qty     Amount\n";
-  text += "-----------------------------------------------\n";
-
-  let total = 0;
-
-  // ===== ITEMS =====
-  for (let id in cart) {
-    const p = products.find(x => x.id == id);
-    if (!p) continue;
-
-    const qty = cart[id];
-    const amount = p.price * qty;
-    total += amount;
-
-    const item = p.name.substring(0, 18).padEnd(18, " ");
-    const qtyText = ("x" + qty).padEnd(7, " ");
-    const amtText = ("Rs " + amount.toFixed(2)).padStart(10, " ");
-
-    text += item + qtyText + amtText + "\n";
-  }
-
-  // ===== TOTAL =====
-  text += "-----------------------------------------------\n";
-  text += "TOTAL AMOUNT             Rs " + total.toFixed(2) + "\n";
-  text += "-----------------------------------------------\n";
-
-  // ===== END MONOSPACE =====
-  text += "```" + "\n";
-
-  // ===== FOOTER =====
-  text += "Thank you for shopping!\n";
-  text += "Please visit again :)\n";
-
+   text += `Thank you for shopping!\n`;
+  text += `Please visit again :)\n`;
   return text;
 }
 
@@ -761,6 +708,7 @@ function shareToWhatsAppText() {
 window.downloadImage = downloadImage;
 window.shareImage = shareImage;
 window.shareToWhatsAppText = shareToWhatsAppText;
+
 
 
 
