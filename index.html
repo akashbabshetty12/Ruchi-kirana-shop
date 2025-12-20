@@ -7,11 +7,8 @@
 
   <link rel="stylesheet" href="style.css">
 
-  <!-- ✅ jsPDF (IRCTC-style PDF save & share) -->
+  <!-- jsPDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-  <!-- ✅ Main app JS -->
-  <script src="script.js" defer></script>
 </head>
 
 <body>
@@ -48,7 +45,7 @@
       <h2>Manage Products</h2>
       <table id="adminTable" class="adminTable"></table>
 
-      <h2 style="margin-top:10px;">Add Product</h2>
+      <h2>Add Product</h2>
       <input id="pName" class="input" placeholder="Product name">
       <input id="pCategory" class="input" placeholder="Category">
       <input id="pPrice" class="input" type="number" placeholder="Price">
@@ -94,13 +91,16 @@
         <b>Total:</b> <span id="grandTotalText">₹0</span>
       </div>
 
-      <button class="btn primary" onclick="saveBillPDF()">Save Bill</button>
-      <button class="btn dark" onclick="shareBillPDF()">Share Bill</button>
+      <button class="btn primary" onclick="downloadImage()">Save Bill</button>
+      <button class="btn dark" onclick="shareImage()">Share Bill</button>
       <button class="btn" onclick="clearCart()">Clear Cart</button>
     </div>
 
   </div>
 </div>
+
+<!-- ✅ LOAD YOUR JS -->
+<script src="script.js"></script>
 
 </body>
 </html>
