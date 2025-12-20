@@ -2,12 +2,8 @@
 let products = JSON.parse(localStorage.getItem("products")) || [
  { id: 1, name: "Gold Flake", category: "Cigarette", price: 60, active: true },
  { id: 2, name: "Bristol", category: "Cigarette", price: 140, active: true },
- { id: 3, name: "Gold Flake king", category: "Cigarette", price: 50, active: true },
- { id: 4, name: "Gold Flake Lites", category: "Cigarette", price: 20, active: true },
- { id: 5, name: "Players", category: "Cigarette", price: 35, active: true },
- { id: 6, name: "Indiment", category: "Cigarette", price: 140, active: true },
- { id: 7, name: "Garam", category: "Cigarette", price: 50, active: true },
- { id: 8, name: "Black", category: "Cigarette", price: 20, active: true }
+ { id: 3, name: "Vimal", category: "Pan Masala", price: 20, active: true },
+ { id: 4, name: "Good Day", category: "Biscuits", price: 35, active: true }
 ];
 
 let cart = {};
@@ -20,7 +16,7 @@ let savedAdminPin = localStorage.getItem("adminPin");
 
 function requestAdminPin() {
   if (!savedAdminPin) {
-    const pin = prompt("Set new Admin PIN:");
+    const pin = prompt("Set Admin PIN:");
     if (!pin) return false;
     localStorage.setItem("adminPin", pin);
     savedAdminPin = pin;
@@ -30,7 +26,7 @@ function requestAdminPin() {
   return prompt("Enter Admin PIN:") === savedAdminPin;
 }
 
-/**************** NORMALIZE ****************/
+/**************** NORMALIZE PRODUCTS ****************/
 function normalizeProducts() {
   products = products.map(p => ({
     ...p,
@@ -42,44 +38,40 @@ function normalizeProducts() {
 }
 normalizeProducts();
 
-/**************** CUSTOMER NAME ****************/
-function validateCustomerName(show = true) {
-  const n1 = document.getElementById("custName");
-  const n2 = document.getElementById("custNameDrawer");
-  const name = n1?.value.trim() || "";
-  const dname = n2?.value.trim() || "";
-
-  if (!name || !dname) {
-    if (show) alert("Please enter customer name first.");
+/**************** CUSTOMER NAME VALIDATION ****************/
+/* ✅ ONLY checks main customer name */
+function validateCustomerName(showError = true) {
+  const name = document.getElementById("custName")?.value.trim() || "";
+  if (!name) {
+    if (showError) alert("Please enter customer name first.");
     return false;
   }
   return true;
 }
 
-/**************** CATEGORY ****************/
+/**************** CATEGORY TABS ****************/
 function getCategories() {
   return [...new Set(products.filter(p => p.active).map(p => p.category))];
 }
 
 function renderCategoryTabs() {
   const wrap = document.getElementById("categoryTabs");
-  if (!wrap) return;
   wrap.innerHTML = "";
 
-  const btnAll = document.createElement("button");
-  btnAll.className = "catTab" + (selectedCategory === "All" ? " active" : "");
-  btnAll.textContent = "All";
-  btnAll.onclick = () => {
+  const allBtn = document.createElement("button");
+  allBtn.textContent = "All";
+  allBtn.className = selectedCategory === "All" ? "active" : "";
+  allBtn.onclick = () => {
     selectedCategory = "All";
     renderCategoryTabs();
     renderProducts();
   };
-  wrap.appendChild(btnAll);
+  wrap.appendChild(allBtn);
 
   getCategories().forEach(cat => {
     const b = document.createElement("button");
-    b.className = "catTab" + (selectedCategory === cat ? " active" : "");
     b.textContent = cat;
+    b.className = selectedCategory === cat ? "active" : "";
     b.onclick = () => {
       selectedCategory = cat;
       renderCategoryTabs();
@@ -92,7 +84,6 @@ function renderCategoryTabs() {
 /**************** PRODUCTS ****************/
 function renderProducts() {
   const list = document.getElementById("productList");
-  if (!list) return;
   list.innerHTML = "";
 
   products
@@ -102,21 +93,21 @@ function renderProducts() {
       const div = document.createElement("div");
       div.className = "product";
       div.innerHTML = `
-        <div class="product-info">
-          <div class="product-name">${p.name}</div>
-          <div class="product-cat">${p.category}</div>
-          <div class="product-price">₹${p.price}</div>
+        <div>
+          <b>${p.name}</b><br>
+          ₹${p.price}
         </div>
-        <div class="qty">
+        <div>
           <button onclick="updateQty(${p.id},-1)">−</button>
           <span>${qty}</span>
-          <button class="plus" onclick="updateQty(${p.id},1)">+</button>
-        </div>`;
+          <button onclick="updateQty(${p.id},1)">+</button>
+        </div>
+      `;
       list.appendChild(div);
     });
 }
 
-/**************** QTY ****************/
+/**************** UPDATE QTY (NAME REQUIRED) ****************/
 function updateQty(id, delta) {
   if (!validateCustomerName()) return;
 
@@ -127,10 +118,15 @@ function updateQty(id, delta) {
 
   if (before === 0 && after > 0) {
     currentBillDate = new Date();
-    document.getElementById("billingDate").textContent = formatDateTime(currentBillDate);
+    document.getElementById("billingDate").textContent =
+      currentBillDate.toLocaleString();
     showDrawer();
   }
-  if (after === 0) clearCart();
+
+  if (after === 0) {
+    clearCart();
+    return;
+  }
 
   renderProducts();
   renderBill();
@@ -138,50 +134,57 @@ function updateQty(id, delta) {
 
 /**************** DRAWER ****************/
 function showDrawer() {
-  document.getElementById("cartDrawer")?.classList.remove("hidden");
+  document.getElementById("cartDrawer").classList.remove("hidden");
 }
-function hideDrawer() {
-  document.getElementById("cartDrawer")?.classList.add("hidden");
-  drawerOpen = false;
+
+function toggleDrawer() {
+  if (!validateCustomerName()) return;
+  drawerOpen = !drawerOpen;
+  document.getElementById("drawerBody").style.display =
+    drawerOpen ? "block" : "none";
 }
 
 /**************** BILL ****************/
 function renderBill() {
-  const tbody = document.getElementById("billBody");
-  if (!tbody) return;
-  tbody.innerHTML = "";
+  const body = document.getElementById("billBody");
+  body.innerHTML = "";
 
-  let total = 0, items = 0;
+  let total = 0;
+  let items = 0;
 
   for (let id in cart) {
     const p = products.find(x => x.id == id);
-    if (!p) continue;
     const qty = cart[id];
-    const amt = qty * p.price;
+    const amt = p.price * qty;
     total += amt;
     items += qty;
 
-    tbody.innerHTML += `
+    body.innerHTML += `
       <tr>
         <td>${p.name}</td>
-        <td style="text-align:center">${qty}</td>
-        <td class="amount">₹${amt.toFixed(2)}</td>
+        <td>${qty}</td>
+        <td>₹${amt}</td>
       </tr>`;
   }
 
-  document.getElementById("grandTotalText").textContent = "₹" + total.toFixed(2);
-  document.getElementById("drawerTotal").textContent = "₹" + total.toFixed(2);
-  document.getElementById("drawerItems").textContent = items + " item(s)";
+  document.getElementById("grandTotalText").textContent = "₹" + total;
+  document.getElementById("drawerTotal").textContent = "₹" + total;
+  document.getElementById("drawerItems").textContent =
+    items + " item" + (items !== 1 ? "s" : "");
 }
 
-/**************** CLEAR ****************/
+/**************** CLEAR CART ****************/
 function clearCart() {
   cart = {};
   currentBillDate = null;
+
   document.getElementById("billBody").innerHTML = "";
   document.getElementById("grandTotalText").textContent = "₹0";
+  document.getElementById("drawerTotal").textContent = "₹0";
+  document.getElementById("drawerItems").textContent = "0 items";
   document.getElementById("billingDate").textContent = "—";
-  hideDrawer();
+
+  document.getElementById("cartDrawer").classList.add("hidden");
   renderProducts();
 }
 
@@ -190,62 +193,106 @@ function getTotalItems() {
   return Object.values(cart).reduce((a, b) => a + b, 0);
 }
 
-function formatDateTime(dt) {
-  if (!dt) return "—";
-  return dt.toLocaleString();
-}
-
 /**************** HISTORY ****************/
 function saveBillToHistory() {
-  let bills = JSON.parse(localStorage.getItem("bills") || "[]");
+  const bills = JSON.parse(localStorage.getItem("bills") || "[]");
   bills.push({
     id: Date.now(),
-    date: new Date().toISOString(),
     customer: document.getElementById("custName").value,
+    date: new Date().toISOString(),
     cart: { ...cart },
     total: document.getElementById("grandTotalText").textContent
   });
   localStorage.setItem("bills", JSON.stringify(bills));
+  renderHistory();
 }
 
 function renderHistory() {
   const list = document.getElementById("historyList");
-  if (!list) return;
   const bills = JSON.parse(localStorage.getItem("bills") || "[]");
+
   list.innerHTML = bills.length ? "" : "No bills saved.";
 
   bills.slice().reverse().forEach(b => {
-    const d = document.createElement("div");
-    d.className = "history-item";
-    d.innerHTML = `
-      <b>${b.customer}</b><br>
-      <small>${new Date(b.date).toLocaleString()}</small><br>
-      <b>${b.total}</b>
-      <button onclick="recreateBill(${b.id})">Load</button>
-      <button onclick="deleteBill(${b.id})">Delete</button>`;
-    list.appendChild(d);
+    list.innerHTML += `
+      <div style="margin-bottom:8px;">
+        <b>${b.customer}</b><br>
+        <small>${new Date(b.date).toLocaleString()}</small><br>
+        <b>${b.total}</b>
+        <button onclick="recreateBill(${b.id})">Load</button>
+      </div>`;
   });
-}
-
-function deleteBill(id) {
-  let bills = JSON.parse(localStorage.getItem("bills") || "[]");
-  bills = bills.filter(b => b.id !== id);
-  localStorage.setItem("bills", JSON.stringify(bills));
-  renderHistory();
 }
 
 function recreateBill(id) {
   const bills = JSON.parse(localStorage.getItem("bills") || "[]");
   const b = bills.find(x => x.id === id);
   if (!b) return;
+
   cart = { ...b.cart };
   currentBillDate = new Date(b.date);
+
   document.getElementById("custName").value = b.customer;
   document.getElementById("custNameDrawer").value = b.customer;
-  document.getElementById("billingDate").textContent = formatDateTime(currentBillDate);
+  document.getElementById("billingDate").textContent =
+    currentBillDate.toLocaleString();
+
   renderProducts();
   renderBill();
   showDrawer();
+}
+
+function clearHistory() {
+  localStorage.removeItem("bills");
+  renderHistory();
+}
+
+/**************** ADMIN ****************/
+function renderAdmin() {
+  const table = document.getElementById("adminTable");
+  table.innerHTML = `
+    <tr>
+      <th>Name</th>
+      <th>Category</th>
+      <th>Price</th>
+      <th>Active</th>
+    </tr>`;
+
+  products.forEach((p, i) => {
+    table.innerHTML += `
+      <tr>
+        <td><input value="${p.name}" onchange="editProduct(${i},'name',this.value)"></td>
+        <td><input value="${p.category}" onchange="editProduct(${i},'category',this.value)"></td>
+        <td><input type="number" value="${p.price}" onchange="editProduct(${i},'price',this.value)"></td>
+        <td><input type="checkbox" ${p.active ? "checked" : ""} onchange="editProduct(${i},'active',this.checked)"></td>
+      </tr>`;
+  });
+}
+
+function editProduct(i, field, value) {
+  products[i][field] = field === "price" ? Number(value) : value;
+  normalizeProducts();
+  renderCategoryTabs();
+  renderProducts();
+}
+
+function addProduct() {
+  products.push({
+    id: Date.now(),
+    name: pName.value,
+    category: pCategory.value || "General",
+    price: Number(pPrice.value),
+    active: pActive.checked
+  });
+  normalizeProducts();
+  renderAdmin();
+  renderCategoryTabs();
+  renderProducts();
+}
+
+function saveProducts() {
+  normalizeProducts();
+  alert("Products saved");
 }
 
 /**************** IRCTC STYLE SAVE (PDF) ****************/
@@ -254,11 +301,13 @@ function saveBillPDF() {
 
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
-  let y = 10, total = 0;
+
+  let y = 10;
+  let total = 0;
 
   doc.text("Ruchi Kirana Shop", 10, y); y += 8;
   doc.text(`Customer: ${custName.value}`, 10, y); y += 6;
-  doc.text(`Date: ${formatDateTime(currentBillDate || new Date())}`, 10, y); y += 8;
+  doc.text(`Date: ${new Date().toLocaleString()}`, 10, y); y += 8;
 
   for (let id in cart) {
     const p = products.find(x => x.id == id);
@@ -270,8 +319,8 @@ function saveBillPDF() {
 
   doc.text(`TOTAL: ₹${total}`, 10, y + 4);
   doc.save(`Ruchi_Bill_${Date.now()}.pdf`);
+
   saveBillToHistory();
-  alert("Bill saved successfully");
 }
 
 /**************** IRCTC STYLE SHARE (PDF) ****************/
@@ -281,23 +330,50 @@ async function shareBillPDF() {
 
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
-  let y = 10, total = 0;
 
-  doc.text("Ruchi Kirana Shop", 10, y); y += 8;
+  let y = 10;
+  let total = 0;
 
   for (let id in cart) {
     const p = products.find(x => x.id == id);
     const amt = p.price * cart[id];
     total += amt;
-    doc.text(`${p.name} x ${cart[id]} ₹${amt}`, 10, y);
+    doc.text(`${p.name} x ${cart[id]} = ₹${amt}`, 10, y);
     y += 6;
   }
 
   doc.text(`TOTAL: ₹${total}`, 10, y + 6);
 
-  const file = new File([doc.output("blob")], "Ruchi_Bill.pdf", { type: "application/pdf" });
-  await navigator.share({ title: "Ruchi Bill", files: [file] });
+  const file = new File(
+    [doc.output("blob")],
+    "Ruchi_Bill.pdf",
+    { type: "application/pdf" }
+  );
+
+  await navigator.share({ files: [file] });
 }
+
+/**************** TABS ****************/
+customerTab.onclick = () => {
+  customerSection.style.display = "block";
+  adminSection.style.display = "none";
+  historySection.style.display = "none";
+};
+
+adminTab.onclick = () => {
+  if (!requestAdminPin()) return;
+  adminSection.style.display = "block";
+  customerSection.style.display = "none";
+  historySection.style.display = "none";
+  renderAdmin();
+};
+
+historyTab.onclick = () => {
+  historySection.style.display = "block";
+  customerSection.style.display = "none";
+  adminSection.style.display = "none";
+  renderHistory();
+};
 
 /**************** INIT ****************/
 renderCategoryTabs();
