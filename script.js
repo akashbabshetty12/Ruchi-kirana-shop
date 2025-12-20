@@ -320,7 +320,7 @@ function formatDateTime(dt) {
 }
 
 /************** BILL TEXT FOR WHATSAPP **************/
-function buildBillText() {
+/*function buildBillText() {
   const name = (document.getElementById("custName")?.value || "").trim();
   const total = document.getElementById("grandTotalText")?.textContent || "₹0";
   const date = formatDateTime(currentBillDate || new Date());
@@ -336,7 +336,50 @@ function buildBillText() {
 
   text += `---------------------\nTOTAL: ${total}\n`;
   return text;
+} */
+
+function buildBillText() {
+  const name = (document.getElementById("custName")?.value || "").trim() || "-";
+  const date = formatDateTime(currentBillDate || new Date());
+  const billNo = String(localStorage.getItem("billNo") || "123").padStart(6, "0");
+
+  let text = "";
+  text += "🛒 Ruchi Kirana Shop\n";
+  text += "Best Prices. Everyday Essentials\n";
+  text += "--------------------------------\n";
+  text += `📅 Date : ${date}\n`;
+  text += `👤 Customer : ${name}\n`;
+  text += `🧾 Bill No : ${billNo}\n`;
+  text += "--------------------------------\n";
+  text += "Item                Qty     Amount\n";
+  text += "--------------------------------\n";
+
+  let total = 0;
+
+  for (let id in cart) {
+    const p = products.find(x => x.id == id);
+    if (!p) continue;
+
+    const qty = cart[id];
+    const amount = p.price * qty;
+    total += amount;
+
+    const item = p.name.padEnd(18, " ");
+    const qtyText = ("×" + qty).padEnd(7, " ");
+    const amtText = ("₹" + amount.toFixed(2)).padStart(10, " ");
+
+    text += `${item}${qtyText}${amtText}\n`;
+  }
+
+  text += "--------------------------------\n";
+  text += `💰 TOTAL AMOUNT             ₹${total.toFixed(2)}\n`;
+  text += "--------------------------------\n";
+  text += "🙏 Thank you for shopping!\n";
+  text += "Please visit again 🙂\n";
+
+  return text;
 }
+
 
 /************** SAVE BILL HISTORY **************/
 function saveBillToHistory() {
@@ -703,3 +746,4 @@ function shareToWhatsAppText() {
 window.downloadImage = downloadImage;
 window.shareImage = shareImage;
 window.shareToWhatsAppText = shareToWhatsAppText;
+
