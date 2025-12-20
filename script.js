@@ -346,19 +346,19 @@ function buildBillText() {
   let text = "";
 
   // ===== HEADER =====
-  text += "+--------------------------------+\n";
-  text += "|     Ruchi Kirana Shop          |\n";
-  text += "|  Best Prices. Everyday Needs   |\n";
-  text += "+--------------------------------+\n";
+  text += `-----------------------------------------------\n`;
+  text += "  >>> Ruchi Kirana Shop <<<         \n";
+  text += "  Best Prices. Everyday Needs  \n";
+  text += `-----------------------------------------------\n`;
 
   // ===== BILL INFO =====
   text += `Date     : ${date}\n`;
   text += `Customer : ${name}\n`;
 
   // ===== ITEM HEADER =====
-  text += "--------------------------------\n";
+  text += `-----------------------------------------------\n`;
   text += "Item                Qty     Amount\n";
-  text += "--------------------------------\n";
+  text += `-----------------------------------------------\n`;
 
   let total = 0;
 
@@ -379,13 +379,13 @@ function buildBillText() {
   }
 
   // ===== TOTAL =====
-  text += "--------------------------------\n";
+  text += `------------------------------------------------\n`;
   text += `TOTAL AMOUNT             Rs ${total.toFixed(2)}\n`;
-  text += "--------------------------------\n";
+  text += `-----------------------------------------------\n`;
 
   // ===== FOOTER =====
-  text += "Thank you for shopping!\n";
-  text += "Please visit again :)\n";
+  text += `Thank you for shopping!\n`;
+  text += `Please visit again :)\n`;
 
   return text;
 }
@@ -756,6 +756,7 @@ function shareToWhatsAppText() {
 window.downloadImage = downloadImage;
 window.shareImage = shareImage;
 window.shareToWhatsAppText = shareToWhatsAppText;
+
 
 
 
