@@ -558,107 +558,148 @@ renderAdmin();
 renderHistory();
 
 /* ---------------------------------------------------------
-   PDF SAVE (IRCTC-STYLE) — IMAGE CODE REMOVED
-   Everything else remains unchanged
+   IMAGE GENERATION + SAVE + WHATSAPP SHARE (FIXED)
 ----------------------------------------------------------*/
 
-function downloadImage() {
-  if (!validateCustomerName()) return;
-
-  if (!window.jspdf || !window.jspdf.jsPDF) {
-    alert("PDF library not loaded.");
-    return;
-  }
-
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({
-    unit: "mm",
-    format: [80, 200] // receipt-style
-  });
-
-  let y = 10;
-  let total = 0;
-
-  doc.setFontSize(12);
-  doc.text("Ruchi Kirana Shop", 40, y, { align: "center" });
-  y += 6;
-
-  doc.setFontSize(9);
-  doc.text(`Date: ${formatDateTime(currentBillDate || new Date())}`, 5, y);
-  y += 5;
-  doc.text(`Customer: ${document.getElementById("custName").value}`, 5, y);
-  y += 6;
-
-  doc.line(5, y, 75, y);
-  y += 4;
+function generateBillHTML() {
+  let html = `<div style='padding:20px;font-family:sans-serif;border:1px solid #ccc;width:320px;background:white;color:#111;'>`;
+  html += `<h2 style="margin:0 0 8px 0;">🛒 Ruchi Kirana Shop</h2>`;
+  html += `<div style="font-size:13px;margin-bottom:6px;">Date: ${formatDateTime(currentBillDate || new Date())}</div>`;
+  html += `<div style="font-size:13px;margin-bottom:6px;">Customer: ${(document.getElementById("custName")?.value || "").trim()}</div>`;
+  html += `<hr style="border:none;border-top:1px solid #eee;margin:8px 0;">`;
 
   for (let id in cart) {
     const p = products.find(x => x.id == id);
     if (!p) continue;
-
-    const qty = cart[id];
-    const amt = qty * p.price;
-    total += amt;
-
-    doc.text(`${p.name} x ${qty}`, 5, y);
-    doc.text(`Rs. ${amt.toFixed(2)}`, 75, y, { align: "right" });
-    y += 5;
-
-    if (y > 190) {
-      doc.addPage();
-      y = 10;
-    }
+    html += `<div style="display:flex;justify-content:space-between;font-size:13px;margin:4px 0;">
+               <span>${p.name} × ${cart[id]}</span>
+               <strong>₹${(p.price * cart[id]).toFixed(2)}</strong>
+             </div>`;
   }
 
-  y += 3;
-  doc.line(5, y, 75, y);
-  y += 6;
-
-  doc.setFontSize(11);
-  doc.text(`TOTAL: Rs. ${total.toFixed(2)}`, 40, y, { align: "center" });
-
-  doc.save(`Ruchi_Bill_${Date.now()}.pdf`);
-
-  saveBillToHistory();
+  html += `<hr style="border:none;border-top:1px solid #eee;margin:8px 0;">`;
+  html += `<h3 style="margin:6px 0 0 0;">Total: ${document.getElementById("grandTotalText")?.textContent || "₹0"}</h3>`;
+  html += `</div>`;
+  return html;
 }
 
-/* OPTIONAL: Share PDF using system share (if supported) */
+async function generateBillBlob() {
+  if (!validateCustomerName()) throw new Error("Enter customer name first.");
+
+  if (typeof html2canvas !== "function") {
+    throw new Error("html2canvas is not loaded. Please include html2canvas library.");
+  }
+
+  const billDiv = document.getElementById("billPreview");
+  if (!billDiv) throw new Error("Missing #billPreview element.");
+
+  billDiv.innerHTML = generateBillHTML();
+  billDiv.style.display = "block";
+
+  try {
+    const canvas = await html2canvas(billDiv, { scale: 2 });
+    const blob = await new Promise(res => canvas.toBlob(res, "image/png"));
+    return blob;
+  } finally {
+    billDiv.style.display = "none";
+    billDiv.innerHTML = "";
+  }
+}
+
+async function downloadImage() {
+  try {
+    const blob = await generateBillBlob();
+    saveBillToHistory();
+
+    if (window.showSaveFilePicker) {
+      try {
+        const opts = {
+          types: [
+            {
+              description: "PNG image",
+              accept: { "image/png": [".png"] }
+            }
+          ]
+        };
+        const handle = await window.showSaveFilePicker(opts);
+        const writable = await handle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+        alert("Saved successfully.");
+        return;
+      } catch (err) {
+        console.warn("showSaveFilePicker failed or cancelled:", err);
+      }
+    }
+
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `Bill_${Date.now()}.png`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
+    alert("Download started.");
+  } catch (err) {
+    console.error(err);
+    alert(err.message || "Failed to save image.");
+  }
+}
+
 async function shareImage() {
-  if (!validateCustomerName()) return;
+  try {
+    const blob = await generateBillBlob();
+    saveBillToHistory();
 
-  if (!navigator.canShare || !window.jspdf) {
-    alert("PDF sharing not supported on this device.");
-    return;
+    const file = new File([blob], `Bill_${Date.now()}.png`, { type: "image/png" });
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: "Bill - Ruchi Kirana Shop",
+          text: buildBillText()
+        });
+        return;
+      } catch (err) {
+        console.warn("navigator.share with files failed:", err);
+      }
+    }
+
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          files: [file],
+          title: "Bill - Ruchi Kirana Shop",
+          text: buildBillText()
+        });
+        return;
+      } catch (err) {
+        console.warn("navigator.share attempt failed:", err);
+      }
+    }
+
+    alert("Image sharing not supported on this device. Using text fallback.");
+    shareToWhatsAppText();
+
+  } catch (err) {
+    console.error(err);
+    if (err.message && err.message.includes("html2canvas")) {
+      alert("Image generation failed. Make sure html2canvas library is included.");
+    } else {
+      alert("Sharing failed.");
+    }
   }
+}
 
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  let y = 10;
-  let total = 0;
-
-  doc.text("Ruchi Kirana Shop", 10, y); y += 8;
-
-  for (let id in cart) {
-    const p = products.find(x => x.id == id);
-    const amt = p.price * cart[id];
-    total += amt;
-    doc.text(`${p.name} x ${cart[id]} = ₹${amt}`, 10, y);
-    y += 6;
-  }
-
-  doc.text(`TOTAL: ₹${total}`, 10, y + 6);
-
-  const file = new File(
-    [doc.output("blob")],
-    "Ruchi_Bill.pdf",
-    { type: "application/pdf" }
-  );
-
-  await navigator.share({
-    files: [file],
-    title: "Ruchi Kirana Shop Bill"
-  });
+function shareToWhatsAppText() {
+  if (!validateCustomerName()) return alert("Enter customer name first.");
+  const text = encodeURIComponent(buildBillText());
+  const url = "https://wa.me/?text=" + text;
+  window.open(url, "_blank", "noopener");
 }
 
 window.downloadImage = downloadImage;
 window.shareImage = shareImage;
+window.shareToWhatsAppText = shareToWhatsAppText;
