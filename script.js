@@ -601,7 +601,7 @@ function downloadImage() {
     total += amt;
 
     doc.text(`${p.name} x ${qty}`, 5, y);
-    doc.text(`₹${amt.toFixed(2)}`, 75, y, { align: "right" });
+    doc.text(`Rs. ${amt.toFixed(2)}`, 75, y, { align: "right" });
     y += 5;
 
     if (y > 190) {
@@ -615,7 +615,7 @@ function downloadImage() {
   y += 6;
 
   doc.setFontSize(11);
-  doc.text(`TOTAL: ₹${total.toFixed(2)}`, 40, y, { align: "center" });
+  doc.text(`TOTAL: Rs. ${total.toFixed(2)}`, 40, y, { align: "center" });
 
   doc.save(`Ruchi_Bill_${Date.now()}.pdf`);
 
