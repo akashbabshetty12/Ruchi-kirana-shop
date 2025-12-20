@@ -339,24 +339,30 @@ function formatDateTime(dt) {
 } */
 
 function buildBillText() {
-  const name = (document.getElementById("custName")?.value || "").trim() || "-";
+  const name =
+    (document.getElementById("custName")?.value || "").trim() || "-";
   const date = formatDateTime(currentBillDate || new Date());
-  const billNo = String(localStorage.getItem("billNo") || "123").padStart(6, "0");
 
   let text = "";
-    text += "+--------------------------------+\n";
+
+  // ===== HEADER =====
+  text += "+--------------------------------+\n";
   text += "|     Ruchi Kirana Shop          |\n";
   text += "|  Best Prices. Everyday Needs   |\n";
   text += "+--------------------------------+\n";
-  text += `:: Date : ${date}\n`;
-  text += `>> Customer : ${name}\n`;
-  text += `## Bill No : ${billNo}\n`;
+
+  // ===== BILL INFO =====
+  text += `Date     : ${date}\n`;
+  text += `Customer : ${name}\n`;
+
+  // ===== ITEM HEADER =====
   text += "--------------------------------\n";
   text += "Item                Qty     Amount\n";
   text += "--------------------------------\n";
 
   let total = 0;
 
+  // ===== ITEMS =====
   for (let id in cart) {
     const p = products.find(x => x.id == id);
     if (!p) continue;
@@ -366,16 +372,19 @@ function buildBillText() {
     total += amount;
 
     const item = p.name.padEnd(18, " ");
-    const qtyText = ("×" + qty).padEnd(7, " ");
-    const amtText = ("₹" + amount.toFixed(2)).padStart(10, " ");
+    const qtyText = ("x" + qty).padEnd(7, " ");
+    const amtText = ("Rs " + amount.toFixed(2)).padStart(10, " ");
 
     text += `${item}${qtyText}${amtText}\n`;
   }
 
+  // ===== TOTAL =====
   text += "--------------------------------\n";
-  text += `=> TOTAL AMOUNT             ₹${total.toFixed(2)}\n`;
+  text += `TOTAL AMOUNT             Rs ${total.toFixed(2)}\n`;
   text += "--------------------------------\n";
-  text += " Thank you for shopping!\n";
+
+  // ===== FOOTER =====
+  text += "Thank you for shopping!\n";
   text += "Please visit again :)\n";
 
   return text;
@@ -747,5 +756,6 @@ function shareToWhatsAppText() {
 window.downloadImage = downloadImage;
 window.shareImage = shareImage;
 window.shareToWhatsAppText = shareToWhatsAppText;
+
 
 
