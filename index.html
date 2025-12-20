@@ -79,22 +79,43 @@
       <div id="drawerTotal">₹0</div>
     </div>
 
-    <div id="drawerBody" style="display:none;">
-      <div>Billing Date: <span id="billingDate">—</span></div>
-      <input id="custNameDrawer" placeholder="Enter customer name">
+    <div id="drawerBody" class="drawer-body" style="display:none;">
 
-      <table>
-        <tbody id="billBody"></tbody>
-      </table>
+  <div class="drawer-row">
+    <span class="label">Billing Date</span>
+    <span id="billingDate" class="value">—</span>
+  </div>
 
-      <div>
-        <b>Total:</b> <span id="grandTotalText">₹0</span>
-      </div>
+  <div class="drawer-row">
+    <span class="label">Customer</span>
+    <input id="custNameDrawer" placeholder="Enter customer name">
+  </div>
 
-      <button class="btn primary" onclick="downloadImage()">Save Bill</button>
-      <button class="btn dark" onclick="shareImage()">Share Bill</button>
-      <button class="btn" onclick="clearCart()">Clear Cart</button>
-    </div>
+  <table id="billTable" class="billTable">
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th style="width:40px;">Qty</th>
+        <th class="amount">Total</th>
+      </tr>
+    </thead>
+    <tbody id="billBody"></tbody>
+  </table>
+
+  <div class="drawer-row total-row">
+    <span>Total</span>
+    <span id="grandTotalText">₹0</span>
+  </div>
+
+  <div class="drawer-buttons">
+    <!-- SAME BUTTON, ONLY FUNCTION LOGIC CHANGED -->
+    <button class="btn primary" onclick="downloadImage()">Save Bill</button>
+    <button class="btn dark" onclick="shareImage()">Share Bill</button>
+    <button class="btn" style="background:#9ca3af;color:white;" onclick="clearCart()">Clear Cart</button>
+  </div>
+
+</div>
+
 
   </div>
 </div>
