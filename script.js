@@ -346,19 +346,21 @@ function buildBillText() {
   let text = "";
 
   // ===== HEADER =====
-  text += `-----------------------------------------------\n`;
-  text += "  >>> Ruchi Kirana Shop <<<         \n";
-  text += "  Best Prices. Everyday Needs  \n";
-  text += `-----------------------------------------------\n`;
+  text += "-----------------------------------------------\n";
+  text += "  >>> Ruchi Kirana Shop <<<\n";
+  text += "  Best Prices. Everyday Needs\n";
+  text += "-----------------------------------------------\n";
 
   // ===== BILL INFO =====
-  text += `Date     : ${date}\n`;
-  text += `Customer : ${name}\n`;
+  text += "Date     : " + date + "\n";
+  text += "Customer : " + name + "\n\n";
+
+  // ===== START MONOSPACE (IMPORTANT) =====
+  text += "```" + "\n";
 
   // ===== ITEM HEADER =====
-  text += `-----------------------------------------------\n`;
   text += "Item                Qty     Amount\n";
-  text += `-----------------------------------------------\n`;
+  text += "-----------------------------------------------\n";
 
   let total = 0;
 
@@ -371,21 +373,24 @@ function buildBillText() {
     const amount = p.price * qty;
     total += amount;
 
-    const item = p.name.padEnd(18, " ");
+    const item = p.name.substring(0, 18).padEnd(18, " ");
     const qtyText = ("x" + qty).padEnd(7, " ");
     const amtText = ("Rs " + amount.toFixed(2)).padStart(10, " ");
 
-    text += `${item}${qtyText}${amtText}\n`;
+    text += item + qtyText + amtText + "\n";
   }
 
   // ===== TOTAL =====
-  text += `------------------------------------------------\n`;
-  text += `TOTAL AMOUNT             Rs ${total.toFixed(2)}\n`;
-  text += `-----------------------------------------------\n`;
+  text += "-----------------------------------------------\n";
+  text += "TOTAL AMOUNT             Rs " + total.toFixed(2) + "\n";
+  text += "-----------------------------------------------\n";
+
+  // ===== END MONOSPACE =====
+  text += "```" + "\n";
 
   // ===== FOOTER =====
-  text += `Thank you for shopping!\n`;
-  text += `Please visit again :)\n`;
+  text += "Thank you for shopping!\n";
+  text += "Please visit again :)\n";
 
   return text;
 }
@@ -756,6 +761,7 @@ function shareToWhatsAppText() {
 window.downloadImage = downloadImage;
 window.shareImage = shareImage;
 window.shareToWhatsAppText = shareToWhatsAppText;
+
 
 
 
