@@ -327,7 +327,8 @@ function buildBillText() {
 
   let text = `>>> Ruchi Kirana Shop <<<\n`;
       text += `Best Prices. Everyday Needs\n`;
-  text += `Date: ${date}\nCustomer: ${name}\n---------------------\n`;
+       text += `--------------------------------\n`;
+  text += `Date: ${date}\nCustomer: ${name}\n-------------------------------\n`;
 
   for (let id in cart) {
     const p = products.find(x => x.id == id);
@@ -335,8 +336,8 @@ function buildBillText() {
     text += `${p.name} × ${cart[id]} = ₹${(p.price * cart[id]).toFixed(2)}\n`;
   }
 
-  text += `---------------------\nTOTAL: ${total}\n`;
-
+  text += `-------------------------------\nTOTAL: ${total}\n`;
+  text += `--------------------------------\n`;
    text += `Thank you for shopping!\n`;
   text += `Please visit again :)\n`;
   return text;
@@ -708,6 +709,7 @@ function shareToWhatsAppText() {
 window.downloadImage = downloadImage;
 window.shareImage = shareImage;
 window.shareToWhatsAppText = shareToWhatsAppText;
+
 
 
 
